@@ -1,10 +1,8 @@
-import './App.css';
-
 function App() {
 
     return (
         <>
-            Hello
+            Security Question - 254110039317
         </>
     );
 }
