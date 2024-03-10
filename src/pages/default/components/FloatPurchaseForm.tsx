@@ -17,12 +17,14 @@ import { useGetMpesaStoresQuery } from '@/services/merchantsApi.ts';
 import { useAuth } from '@/hooks/useAuth.ts';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { login } from '@/features/auth/authSlice.ts';
+import { Method } from '@/lib/enums.ts';
 
 const formSchema = yup.object({
     agent: yup.string().max(100).required('Agent number is required.'),
     store: yup.string().max(100).required('Store number is required.'),
     amount: yup.string().max(100).required('Amount is required.'),
-    method: yup.string().oneOf(['MPESA', 'VOUCHER'], 'Method must be MPESA or VOUCHER').max(100).required('Pyament method is required.'),
+    method: yup.string().oneOf(Object.values(Method), 'Method must be MPESA or VOUCHER')
+        .max(100).required('Payment method is required.'),
 });
 
 const FloatPurchaseForm = () => {
@@ -34,13 +36,15 @@ const FloatPurchaseForm = () => {
     const form = useForm<FloatPurchaseRequest>({
         resolver: yupResolver(formSchema),
         defaultValues: {
-            method: 'MPESA',
+            method: Method.VOUCHER,
         },
     });
 
     if (isLoading) return <Skeleton className={'h-[25rem] w-2/5'} />;
 
-    const handleSubmit: SubmitHandler<LoginRequest> = (values) => console.log(values);
+    const handleSubmit: SubmitHandler<LoginRequest> = (values) => {
+        console.log(values);
+    };
 
     return (
         <Form {...form}>
@@ -100,7 +104,8 @@ const FloatPurchaseForm = () => {
                                         <FormItem>
                                             <FormLabel>Store Number</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="xxxxxx" type={'number'} {...form.register('store')} />
+                                                <Input placeholder="xxxxxx"
+                                                       type={'number'} {...form.register('store')} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -113,7 +118,8 @@ const FloatPurchaseForm = () => {
                                         <FormItem>
                                             <FormLabel>Agent Number</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="xxxxxx" type={'number'} {...form.register('agent')} />
+                                                <Input placeholder="xxxxxx"
+                                                       type={'number'} {...form.register('agent')} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -130,7 +136,8 @@ const FloatPurchaseForm = () => {
                                     <FormItem>
                                         <FormLabel>Amount</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="e.g: 200,000" type={'number'} {...form.register('amount')} />
+                                            <Input placeholder="e.g: 200,000"
+                                                   type={'number'} {...form.register('amount')} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -149,8 +156,8 @@ const FloatPurchaseForm = () => {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem value="VOUCHER">VOUCHER</SelectItem>
-                                                <SelectItem value="MPESA">MPESA</SelectItem>
+                                                {Object.values(Method).map(m => <SelectItem key={m}
+                                                                                            value={m}>{m}</SelectItem>)}
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -158,6 +165,39 @@ const FloatPurchaseForm = () => {
                                 )}
                             />
                         </div>
+
+                        {form.getValues('method') === Method.MPESA && (
+                            <FormField
+                                control={form.control}
+                                name="debit_account"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Phone number</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="0712345678"
+                                                   type={'number'} {...form.register('debit_account')} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
+
+                        {form.getValues('method') === Method.VOUCHER && (
+                            <FormField
+                                control={form.control}
+                                name="pin"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Pin</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="****" type={'number'} {...form.register('pin')} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
                     </CardContent>
                     <CardFooter className="justify-end space-x-2">
                         <Button type={'submit'} disabled={isLoading || !form.formState.isValid}>Purchase</Button>

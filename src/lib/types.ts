@@ -1,7 +1,7 @@
 import { IconType } from 'react-icons';
 import { To } from 'react-router-dom';
 import { ComponentType } from 'react';
-import { Status } from '@/lib/enums.ts';
+import { Method, Status } from '@/lib/enums.ts';
 import { bool } from 'yup';
 
 
@@ -86,6 +86,6 @@ export type FloatPurchaseRequest = {
     agent: string
     store: string
     amount: number
-    method: 'VOUCHER' | 'MPESA'
-    debit_account: 'VOUCHER' | 'MPESA'
+    method: Method
+    debit_account: number
 }

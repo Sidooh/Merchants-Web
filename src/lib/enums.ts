@@ -8,3 +8,8 @@ export enum Status {
     PENDING = 'PENDING',
     REFUNDED = 'REFUNDED',
 }
+
+export enum Method {
+    MPESA = 'MPESA',
+    VOUCHER = 'VOUCHER'
+}
