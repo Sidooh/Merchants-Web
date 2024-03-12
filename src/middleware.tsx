@@ -4,9 +4,10 @@ import { useAppDispatch } from '@/app/store.ts';
 import { login } from '@/features/auth/authSlice.ts';
 import { decodeJWT } from '@/lib/utils.ts';
 import moment from 'moment';
+import { ReactNode } from 'react';
 
 export const Middleware = {
-    Guest: ({ component }: { component: JSX.Element }) => {
+    Guest: ({ component }: { component: ReactNode }) => {
         const { user } = useAuth();
         const location = useLocation();
 
@@ -21,7 +22,7 @@ export const Middleware = {
 
         return component;
     },
-    Auth: ({ component }: { component: JSX.Element }) => {
+    Auth: ({ component }: { component: ReactNode }) => {
         const { user } = useAuth();
         const location = useLocation();
         const dispatch = useAppDispatch();

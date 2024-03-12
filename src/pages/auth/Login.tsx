@@ -44,7 +44,7 @@ const Login = () => {
     }, [user, isError, isSuccess, message, navigate, dispatch]);
 
     return (
-        <Card className={'p-5 h-full max-w-3xl min-w-[30rem] relative shadow-xl border-0'}>
+        <Card className={'p-5 h-full lg:max-w-3xl lg:min-w-[30rem] relative shadow-xl border-0'}>
             <CardHeader>
                 <CardTitle className={'text-end text-primary'}>
                     Welcome
