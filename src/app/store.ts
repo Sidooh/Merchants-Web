@@ -1,16 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '@/features/auth/authSlice';
-import { coreApi } from '@/services/coreApi.ts';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import { accountsApi } from '@/services/accountsApi.ts';
+import { accountsApi } from '@/services/accounts/accountsApi.ts';
+import { merchantsApi } from '@/services/merchants/merchantsApi.ts';
 
 export const store = configureStore({
     reducer: {
         auth: authReducer,
         [accountsApi.reducerPath]: accountsApi.reducer,
-        [coreApi.reducerPath]: coreApi.reducer,
+        [merchantsApi.reducerPath]: merchantsApi.reducer,
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(coreApi.middleware, accountsApi.middleware),
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware().concat(accountsApi.middleware, merchantsApi.middleware),
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

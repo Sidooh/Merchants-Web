@@ -1,7 +1,7 @@
-import { coreApi } from '@/services/coreApi';
-import { ApiResponse, MpesaFloatPurchaseRequest, MpesaFloatPurchaseResponse, MpesaStore } from '@/lib/types';
+import { ApiResponse, MpesaFloatPurchaseRequest, MpesaFloatPurchaseResponse, MpesaStore } from '@/lib/types.ts';
+import { merchantsApi } from '@/services/merchants/merchantsApi.ts';
 
-const merchantsApi = coreApi.injectEndpoints({
+const merchantsEndpoints = merchantsApi.injectEndpoints({
     endpoints: (build) => ({
         buyMpesaFloat: build.mutation<any, MpesaFloatPurchaseRequest>({
             query: ({ merchant_id, ...body }) => ({
@@ -18,4 +18,4 @@ const merchantsApi = coreApi.injectEndpoints({
     }),
 });
 
-export const { useGetMpesaStoresQuery, useBuyMpesaFloatMutation } = merchantsApi;
+export const { useGetMpesaStoresQuery, useBuyMpesaFloatMutation } = merchantsEndpoints;

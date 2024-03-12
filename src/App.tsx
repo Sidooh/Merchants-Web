@@ -5,6 +5,7 @@ import MainLayout from '@/layouts/MainLayout.tsx';
 import Login from '@/pages/auth/Login.tsx';
 import Default from '@/pages/default/Default.tsx';
 import OTP from '@/pages/auth/OTP.tsx';
+import NotFound from '@/pages/errors/NotFound.tsx';
 
 function App() {
     return (
@@ -17,6 +18,8 @@ function App() {
             <Route element={<Middleware.Auth component={<MainLayout />} />}>
                 <Route index element={<Default />} />
             </Route>
+
+            <Route path={'*'} element={<NotFound />} />
         </Routes>
     );
 }

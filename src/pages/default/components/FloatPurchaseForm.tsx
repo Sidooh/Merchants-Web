@@ -10,7 +10,7 @@ import { MpesaFloatPurchaseRequest, MpesaStore, PinConfirmationRequest } from '@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Toggle } from '@/components/ui/toggle.tsx';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useBuyMpesaFloatMutation, useGetMpesaStoresQuery } from '@/services/merchantsApi.ts';
+import { useBuyMpesaFloatMutation, useGetMpesaStoresQuery } from '@/services/merchants/merchantsEndpoints.ts';
 import { useAuth } from '@/hooks/useAuth.ts';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { PaymentMethod } from '@/lib/enums.ts';
@@ -23,10 +23,11 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog.tsx';
-import { useCheckPinMutation } from '@/services/accountsApi.ts';
+import { useCheckPinMutation } from '@/services/accounts/accountsEndpoints.ts';
 import { toast } from '@/lib/utils.ts';
 
 const formSchema = yup.object({
+    merchant_id: yup.number().integer().required(),
     agent: yup.string().max(100).required('Agent number is required.'),
     store: yup.string().max(100).required('Store number is required.'),
     amount: yup.number().integer().required('Amount is required.'),
@@ -46,12 +47,7 @@ const formSchema = yup.object({
 
 const pinConfirmationSchema = yup.object({
     account_id: yup.number().integer().required(),
-    pin: yup
-        .number()
-        .integer('Invalid pin')
-        .min(1000, 'Invalid pin')
-        .max(9999, 'Invalid pin')
-        .required('Pin number is required.'),
+    pin: yup.string().length(4, `Pin must be ${length} digits`).required('Pin number is required.'),
 });
 
 const PinConfirmationForm = ({
@@ -69,13 +65,11 @@ const PinConfirmationForm = ({
     const form = useForm<PinConfirmationRequest>({
         resolver: yupResolver(pinConfirmationSchema),
         defaultValues: {
-            account_id: user.account_id,
+            account_id: user?.account_id,
         },
     });
 
     const handleSubmit: SubmitHandler<PinConfirmationRequest> = async (values) => {
-        values.pin = String(values.pin);
-
         try {
             const isConfirmed = await checkPin(values).unwrap();
 
@@ -141,16 +135,16 @@ const FloatPurchaseForm = () => {
     const [openPinConfirmationForm, setOpenPinConfirmationForm] = useState(false);
 
     const { user } = useAuth();
-    const { data: stores, isLoading: isLoadingStores } = useGetMpesaStoresQuery(user.merchant_id);
+    const { data: stores, isLoading: isLoadingStores } = useGetMpesaStoresQuery(user?.merchant_id);
     const [sendPurchaseRequest, { isLoading }] = useBuyMpesaFloatMutation();
 
     const form = useForm<MpesaFloatPurchaseRequest>({
         mode: 'onBlur',
         resolver: yupResolver(formSchema),
         defaultValues: {
-            merchant_id: user.merchant_id,
+            merchant_id: user?.merchant_id,
             method: PaymentMethod.FLOAT,
-            debit_account: user.phone,
+            debit_account: user?.phone,
         },
     });
 
@@ -187,60 +181,58 @@ const FloatPurchaseForm = () => {
                             <CardDescription>Fill in the form below to purchase float.</CardDescription>
                         </CardHeader>
                         <CardContent className="grid gap-6">
-                            <div className="grid gap-3">
-                                <FormField
-                                    name="store"
-                                    control={form.control}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Select Store</FormLabel>
-                                            <div className="flex gap-3">
-                                                <Select
-                                                    onValueChange={(v) => {
-                                                        const store: MpesaStore | undefined = stores?.find(
-                                                            (s) => s.store == v
-                                                        );
+                            <FormField
+                                name="store"
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Select Store</FormLabel>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            <Select
+                                                onValueChange={(v) => {
+                                                    const store: MpesaStore | undefined = stores?.find(
+                                                        (s) => s.store == v
+                                                    );
 
-                                                        if (store) {
-                                                            form.setValue('agent', store.store);
-                                                            form.setValue('store', store.agent);
-                                                        }
-                                                    }}
-                                                    defaultValue={field.value}
-                                                    disabled={isAddingStore}
-                                                >
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Select a store" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {stores?.map((s) => (
-                                                            <SelectItem key={s.id} value={s.store}>
-                                                                {s.name}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                                <Toggle
-                                                    variant={'outline'}
-                                                    aria-label="Toggle italic"
-                                                    className={'text-nowrap'}
-                                                    onPressedChange={setIsAddingStore}
-                                                >
-                                                    {isAddingStore ? (
-                                                        <CheckIcon className="mr-2 h-4 w-4" />
-                                                    ) : (
-                                                        <PlusIcon className="mr-2 h-4 w-4" />
-                                                    )}
-                                                    {isAddingStore ? 'Select existing store' : 'Add store no'}.
-                                                </Toggle>
-                                            </div>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
+                                                    if (store) {
+                                                        form.setValue('agent', store.store);
+                                                        form.setValue('store', store.agent);
+                                                    }
+                                                }}
+                                                defaultValue={field.value}
+                                                disabled={isAddingStore}
+                                            >
+                                                <FormControl className={'col-span-2'}>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a store" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {stores?.map((s) => (
+                                                        <SelectItem key={s.id} value={s.store}>
+                                                            {s.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <Toggle
+                                                variant={'outline'}
+                                                aria-label="Toggle italic"
+                                                className={'text-nowrap'}
+                                                onPressedChange={setIsAddingStore}
+                                            >
+                                                {isAddingStore ? (
+                                                    <CheckIcon className="mr-2 h-4 w-4" />
+                                                ) : (
+                                                    <PlusIcon className="mr-2 h-4 w-4" />
+                                                )}
+                                                {isAddingStore ? 'Select store' : 'Add store'}
+                                            </Toggle>
+                                        </div>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                             {isAddingStore && (
                                 <div className="grid grid-cols-2 gap-3">
                                     <FormField
