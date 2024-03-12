@@ -25,20 +25,20 @@ import {
 } from '@/components/ui/dialog.tsx';
 import { useCheckPinMutation } from '@/services/accounts/accountsEndpoints.ts';
 import { toast } from '@/lib/utils.ts';
+import { SAFARICOM_REGEX } from '@/constants';
 
 const formSchema = yup.object({
     merchant_id: yup.number().integer().required(),
-    agent: yup.string().max(100).required('Agent number is required.'),
-    store: yup.string().max(100).required('Store number is required.'),
+    agent: yup.string().required('Agent number is required.'),
+    store: yup.string().required('Store number is required.'),
     amount: yup.number().integer().required('Amount is required.'),
     method: yup
         .string()
         .oneOf(Object.values(PaymentMethod), 'Method must be MPESA or VOUCHER')
-        .max(100)
         .required('Payment method is required.'),
     debit_account: yup
-        .number()
-        .integer()
+        .string()
+        .matches(SAFARICOM_REGEX, { message: 'Invalid phone number' })
         .when('method', {
             is: (val: PaymentMethod) => val === PaymentMethod.MPESA,
             then: (s) => s.required('Phone number is required.'),
@@ -135,16 +135,16 @@ const FloatPurchaseForm = () => {
     const [openPinConfirmationForm, setOpenPinConfirmationForm] = useState(false);
 
     const { user } = useAuth();
-    const { data: stores, isLoading: isLoadingStores } = useGetMpesaStoresQuery(user?.merchant_id);
+    const { data: stores, isLoading: isLoadingStores } = useGetMpesaStoresQuery(user!.merchant_id);
     const [sendPurchaseRequest, { isLoading }] = useBuyMpesaFloatMutation();
 
     const form = useForm<MpesaFloatPurchaseRequest>({
         mode: 'onBlur',
-        resolver: yupResolver(formSchema),
+        resolver: yupResolver<MpesaFloatPurchaseRequest>(formSchema),
         defaultValues: {
             merchant_id: user?.merchant_id,
             method: PaymentMethod.FLOAT,
-            debit_account: user?.phone,
+            debit_account: String(user?.phone),
         },
     });
 

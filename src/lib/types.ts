@@ -89,7 +89,7 @@ export type MpesaFloatPurchaseRequest = {
     store: string;
     amount: number;
     method: PaymentMethod;
-    debit_account: number;
+    debit_account?: string;
 };
 
 export type MpesaFloatPurchaseResponse = {

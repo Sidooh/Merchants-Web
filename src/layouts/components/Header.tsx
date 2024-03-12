@@ -75,7 +75,7 @@ const Header = () => {
                         <DropdownMenuTrigger>
                             <Avatar className={'h-8 w-8'}>
                                 <AvatarFallback>
-                                    <span className="sr-only">{user.name}</span>
+                                    <span className="sr-only">{user?.name}</span>
                                     <FaUser />
                                 </AvatarFallback>
                             </Avatar>
@@ -83,9 +83,9 @@ const Header = () => {
                         <DropdownMenuContent align="end">
                             <div className="flex items-center justify-start gap-2 p-2">
                                 <div className="flex flex-col space-y-1 leading-none">
-                                    <p className="font-medium">{user.name}</p>
+                                    <p className="font-medium">{user?.name}</p>
                                     <p className="md:w-[200px] truncate text-xs text-muted-foreground">
-                                        {user.business_name}
+                                        {user?.business_name}
                                     </p>
                                 </div>
                             </div>

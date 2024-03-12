@@ -17,9 +17,10 @@ export const toast = async (options: SweetAlertOptions = {}) => {
         position: 'bottom-right',
         showConfirmButton: false,
         timer: 7000,
+        ...options,
     };
 
-    await Swal.fire({ ...defaultOptions, ...options });
+    await Swal.fire(defaultOptions);
 };
 
 export const decodeJWT = (token: string) => {
