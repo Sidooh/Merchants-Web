@@ -47,7 +47,7 @@ const Login = () => {
         <Card className={'p-5 h-full max-w-3xl min-w-[30rem] relative shadow-xl border-0'}>
             <CardHeader>
                 <CardTitle className={'text-end text-primary'}>
-                    Welcome Back
+                    Welcome
                     <hr className="mt-3 w-1/2 ms-auto" />
                 </CardTitle>
             </CardHeader>
