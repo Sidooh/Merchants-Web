@@ -3,208 +3,362 @@ import { Input } from '@/components/ui/input.tsx';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
-import { cn } from '@/lib/utils.ts';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
-import { CaretSortIcon, CheckIcon, PlusIcon } from '@radix-ui/react-icons';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command.tsx';
+import { CheckCircledIcon, CheckIcon, PlusIcon, ReloadIcon } from '@radix-ui/react-icons';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { FloatPurchaseRequest, LoginRequest, MpesaStore } from '@/lib/types.ts';
+import { MpesaFloatPurchaseRequest, MpesaStore, PinConfirmationRequest } from '@/lib/types.ts';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Toggle } from '@/components/ui/toggle.tsx';
-import { useState } from 'react';
-import { useGetMpesaStoresQuery } from '@/services/merchantsApi.ts';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useBuyMpesaFloatMutation, useGetMpesaStoresQuery } from '@/services/merchantsApi.ts';
 import { useAuth } from '@/hooks/useAuth.ts';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
-import { login } from '@/features/auth/authSlice.ts';
-import { Method } from '@/lib/enums.ts';
+import { PaymentMethod } from '@/lib/enums.ts';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog.tsx';
+import { useCheckPinMutation } from '@/services/accountsApi.ts';
+import { toast } from '@/lib/utils.ts';
 
 const formSchema = yup.object({
     agent: yup.string().max(100).required('Agent number is required.'),
     store: yup.string().max(100).required('Store number is required.'),
-    amount: yup.string().max(100).required('Amount is required.'),
-    method: yup.string().oneOf(Object.values(Method), 'Method must be MPESA or VOUCHER')
-        .max(100).required('Payment method is required.'),
+    amount: yup.number().integer().required('Amount is required.'),
+    method: yup
+        .string()
+        .oneOf(Object.values(PaymentMethod), 'Method must be MPESA or VOUCHER')
+        .max(100)
+        .required('Payment method is required.'),
+    debit_account: yup
+        .number()
+        .integer()
+        .when('method', {
+            is: (val: PaymentMethod) => val === PaymentMethod.MPESA,
+            then: (s) => s.required('Phone number is required.'),
+        }),
 });
 
-const FloatPurchaseForm = () => {
-    const [isAddingStore, setIsAddingStore] = useState(false);
+const pinConfirmationSchema = yup.object({
+    account_id: yup.number().integer().required(),
+    pin: yup
+        .number()
+        .integer('Invalid pin')
+        .min(1000, 'Invalid pin')
+        .max(9999, 'Invalid pin')
+        .required('Pin number is required.'),
+});
 
+const PinConfirmationForm = ({
+    open,
+    setOpen,
+    onConfirmed,
+}: {
+    open: boolean;
+    setOpen: Dispatch<SetStateAction<boolean>>;
+    onConfirmed: Function;
+}) => {
     const { user } = useAuth();
-    const { data: stores, isLoading } = useGetMpesaStoresQuery(user.merchant_id);
+    const [checkPin, { isLoading }] = useCheckPinMutation();
 
-    const form = useForm<FloatPurchaseRequest>({
-        resolver: yupResolver(formSchema),
+    const form = useForm<PinConfirmationRequest>({
+        resolver: yupResolver(pinConfirmationSchema),
         defaultValues: {
-            method: Method.VOUCHER,
+            account_id: user.account_id,
         },
     });
 
-    if (isLoading) return <Skeleton className={'h-[25rem] w-2/5'} />;
+    const handleSubmit: SubmitHandler<PinConfirmationRequest> = async (values) => {
+        values.pin = String(values.pin);
 
-    const handleSubmit: SubmitHandler<LoginRequest> = (values) => {
-        console.log(values);
+        try {
+            const isConfirmed = await checkPin(values).unwrap();
+
+            if (isConfirmed) {
+                onConfirmed();
+            }
+        } catch (e) {
+            toast({ titleText: 'Invalid Pin!', icon: 'warning' });
+        }
     };
 
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)}>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Buy Float</CardTitle>
-                        <CardDescription>
-                            Fill in the form below to purchase float.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="grid gap-6">
-                        <div className="grid gap-3">
-                            <FormField
-                                name="store"
-                                control={form.control}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Select Store</FormLabel>
-                                        <div className="flex gap-3">
-                                            <Select onValueChange={v => {
-                                                const store: MpesaStore = stores.find(s => s.store == v);
-
-                                                form.setValue('agent', store.store);
-                                                form.setValue('store', store.agent);
-                                            }} defaultValue={field.value}
-                                                    disabled={isAddingStore}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a store" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {stores?.map(s => (
-                                                        <SelectItem key={s.id} value={s.store}>{s.name}</SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            <Toggle variant={'outline'} aria-label="Toggle italic"
-                                                    className={'text-nowrap'} onPressedChange={setIsAddingStore}>
-                                                {isAddingStore ? <CheckIcon className="mr-2 h-4 w-4" /> :
-                                                    <PlusIcon className="mr-2 h-4 w-4" />}
-                                                {isAddingStore ? 'Select existing store' : 'Add store no'}.
-                                            </Toggle>
-                                        </div>
-                                        <FormMessage />
-                                    </FormItem>
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(handleSubmit)} className="sm:max-w-md space-y-4">
+                        <DialogHeader>
+                            <DialogTitle>Pin Confirmation</DialogTitle>
+                            <DialogDescription>
+                                Please confirm your Sidooh Pin to complete the purchase.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <FormField
+                            control={form.control}
+                            name="pin"
+                            render={() => (
+                                <FormItem>
+                                    <FormLabel>Pin</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="****" type={'password'} {...form.register('pin')} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <DialogFooter className="sm:justify-between">
+                            <DialogClose asChild>
+                                <Button type="button" variant="secondary">
+                                    Cancel
+                                </Button>
+                            </DialogClose>
+                            <Button type={'submit'} disabled={isLoading || !form.formState.isValid}>
+                                {isLoading ? (
+                                    <>
+                                        Confirming... <ReloadIcon className="ms-2 h-4 w-4 animate-spin" />
+                                    </>
+                                ) : (
+                                    <>
+                                        Confirm <CheckCircledIcon className="ms-2 h-4 w-4" />
+                                    </>
                                 )}
-                            />
-                        </div>
-                        {isAddingStore && (
-                            <div className="grid grid-cols-2 gap-3">
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
+            </DialogContent>
+        </Dialog>
+    );
+};
+
+const FloatPurchaseForm = () => {
+    const [isAddingStore, setIsAddingStore] = useState(false);
+    const [openPinConfirmationForm, setOpenPinConfirmationForm] = useState(false);
+
+    const { user } = useAuth();
+    const { data: stores, isLoading: isLoadingStores } = useGetMpesaStoresQuery(user.merchant_id);
+    const [sendPurchaseRequest, { isLoading }] = useBuyMpesaFloatMutation();
+
+    const form = useForm<MpesaFloatPurchaseRequest>({
+        resolver: yupResolver(formSchema),
+        defaultValues: {
+            merchant_id: user.merchant_id,
+            method: PaymentMethod.FLOAT,
+            debit_account: user.phone,
+        },
+    });
+
+    useEffect(() => {
+        if (stores?.length === 0) setIsAddingStore(true);
+    }, [stores]);
+
+    const completePurchaseRequest = (values: MpesaFloatPurchaseRequest) => {
+        sendPurchaseRequest(values)
+            .unwrap()
+            .then(() => toast({ titleText: 'Purchase Initiated Successfully!' }))
+            .catch(() => toast({ titleText: 'Something went wrong. Please retry!' }));
+    };
+
+    const handleSubmit: SubmitHandler<MpesaFloatPurchaseRequest> = async (values) => {
+        if (values.method === PaymentMethod.FLOAT) {
+            form.setValue('amount', values.amount);
+
+            setOpenPinConfirmationForm(true);
+        } else {
+            completePurchaseRequest(values);
+        }
+    };
+
+    if (isLoadingStores) return <Skeleton className={'h-[25rem] w-2/5'} />;
+
+    return (
+        <>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleSubmit)}>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Buy Float</CardTitle>
+                            <CardDescription>Fill in the form below to purchase float.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="grid gap-6">
+                            <div className="grid gap-3">
                                 <FormField
-                                    control={form.control}
                                     name="store"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Store Number</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="xxxxxx"
-                                                       type={'number'} {...form.register('store')} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
                                     control={form.control}
-                                    name="agent"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Agent Number</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="xxxxxx"
-                                                       type={'number'} {...form.register('agent')} />
-                                            </FormControl>
+                                            <FormLabel>Select Store</FormLabel>
+                                            <div className="flex gap-3">
+                                                <Select
+                                                    onValueChange={(v) => {
+                                                        const store: MpesaStore | undefined = stores?.find(
+                                                            (s) => s.store == v
+                                                        );
+
+                                                        if (store) {
+                                                            form.setValue('agent', store.store);
+                                                            form.setValue('store', store.agent);
+                                                        }
+                                                    }}
+                                                    defaultValue={field.value}
+                                                    disabled={isAddingStore}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a store" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {stores?.map((s) => (
+                                                            <SelectItem key={s.id} value={s.store}>
+                                                                {s.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <Toggle
+                                                    variant={'outline'}
+                                                    aria-label="Toggle italic"
+                                                    className={'text-nowrap'}
+                                                    onPressedChange={setIsAddingStore}
+                                                >
+                                                    {isAddingStore ? (
+                                                        <CheckIcon className="mr-2 h-4 w-4" />
+                                                    ) : (
+                                                        <PlusIcon className="mr-2 h-4 w-4" />
+                                                    )}
+                                                    {isAddingStore ? 'Select existing store' : 'Add store no'}.
+                                                </Toggle>
+                                            </div>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
                             </div>
-                        )}
+                            {isAddingStore && (
+                                <div className="grid grid-cols-2 gap-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="store"
+                                        render={() => (
+                                            <FormItem>
+                                                <FormLabel>Store Number</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        placeholder="xxxxxx"
+                                                        type={'number'}
+                                                        {...form.register('store')}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="agent"
+                                        render={() => (
+                                            <FormItem>
+                                                <FormLabel>Agent Number</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        placeholder="xxxxxx"
+                                                        type={'number'}
+                                                        {...form.register('agent')}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            )}
 
-                        <div className="grid grid-cols-2 gap-3">
-                            <FormField
-                                control={form.control}
-                                name="amount"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Amount</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="e.g: 200,000"
-                                                   type={'number'} {...form.register('amount')} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="method"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Buy using</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <div className="grid grid-cols-2 gap-3">
+                                <FormField
+                                    control={form.control}
+                                    name="amount"
+                                    render={() => (
+                                        <FormItem>
+                                            <FormLabel>Amount</FormLabel>
                                             <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select a payment method" />
-                                                </SelectTrigger>
+                                                <Input
+                                                    placeholder="e.g: 200,000"
+                                                    type={'number'}
+                                                    {...form.register('amount')}
+                                                />
                                             </FormControl>
-                                            <SelectContent>
-                                                {Object.values(Method).map(m => <SelectItem key={m}
-                                                                                            value={m}>{m}</SelectItem>)}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="method"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Buy using</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a payment method" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value={PaymentMethod.FLOAT}>
+                                                        {PaymentMethod.VOUCHER}
+                                                    </SelectItem>
+                                                    <SelectItem value={PaymentMethod.MPESA}>
+                                                        {PaymentMethod.MPESA}
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
 
-                        {form.getValues('method') === Method.MPESA && (
-                            <FormField
-                                control={form.control}
-                                name="debit_account"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Phone number</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="0712345678"
-                                                   type={'number'} {...form.register('debit_account')} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        )}
+                            {form.getValues('method') === PaymentMethod.MPESA && (
+                                <FormField
+                                    control={form.control}
+                                    name="debit_account"
+                                    render={() => (
+                                        <FormItem>
+                                            <FormLabel>M-PESA phone number</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="0712345678"
+                                                    type={'number'}
+                                                    {...form.register('debit_account')}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
+                        </CardContent>
+                        <CardFooter className="justify-end space-x-2">
+                            <Button type={'submit'} disabled={isLoading || !form.formState.isValid}>
+                                Purchase
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                </form>
+            </Form>
 
-                        {form.getValues('method') === Method.VOUCHER && (
-                            <FormField
-                                control={form.control}
-                                name="pin"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Pin</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="****" type={'number'} {...form.register('pin')} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        )}
-                    </CardContent>
-                    <CardFooter className="justify-end space-x-2">
-                        <Button type={'submit'} disabled={isLoading || !form.formState.isValid}>Purchase</Button>
-                    </CardFooter>
-                </Card>
-            </form>
-        </Form>
+            <PinConfirmationForm
+                open={openPinConfirmationForm}
+                setOpen={setOpenPinConfirmationForm}
+                onConfirmed={() => completePurchaseRequest(form.getValues())}
+            />
+        </>
     );
 };
 

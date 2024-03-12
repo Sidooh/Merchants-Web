@@ -1,9 +1,5 @@
-import { IconType } from 'react-icons';
-import { To } from 'react-router-dom';
 import { ComponentType } from 'react';
-import { Method, Status } from '@/lib/enums.ts';
-import { bool } from 'yup';
-
+import { MerchantProduct, PaymentMethod, Status } from '@/lib/enums.ts';
 
 export interface ApiResponse<T> {
     result: 1 | 0;
@@ -26,10 +22,10 @@ export type Model = {
 };
 
 export type Account = Model & {
-    id: number
-    phone: number
-    active: bool
-}
+    id: number;
+    phone: number;
+    active: boolean;
+};
 
 export type Merchant = Model & {
     account_id: number;
@@ -82,10 +78,27 @@ export type FacetedFilterType = {
     }[];
 };
 
-export type FloatPurchaseRequest = {
-    agent: string
-    store: string
-    amount: number
-    method: Method
-    debit_account: number
-}
+export type MpesaFloatPurchaseRequest = {
+    merchant_id: number;
+    agent: string;
+    store: string;
+    amount: number;
+    method: PaymentMethod;
+    debit_account: number;
+};
+
+export type MpesaFloatPurchaseResponse = {
+    id: number;
+    merchant_id: number;
+    description: string;
+    destination: string;
+    amount: number;
+    payment: Payment;
+    product: MerchantProduct;
+    status: Status;
+};
+
+export type PinConfirmationRequest = {
+    account_id: number;
+    pin: string;
+};
