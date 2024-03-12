@@ -9,7 +9,12 @@ export enum Status {
     REFUNDED = 'REFUNDED',
 }
 
-export enum Method {
+export enum PaymentMethod {
+    FLOAT = 'FLOAT',
     MPESA = 'MPESA',
-    VOUCHER = 'VOUCHER'
+    VOUCHER = 'VOUCHER',
+}
+
+export enum MerchantProduct {
+    MPESA_FLOAT = 'MPESA_FLOAT',
 }

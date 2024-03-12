@@ -1,16 +1,16 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useAppDispatch } from '@/app/store.ts';
-import { logout } from '@/features/auth/authSlice.ts';
+import { login } from '@/features/auth/authSlice.ts';
 import { decodeJWT } from '@/lib/utils.ts';
 import moment from 'moment';
 
 export const Middleware = {
     Guest: ({ component }: { component: JSX.Element }) => {
-        const { token } = useAuth();
+        const { user } = useAuth();
         const location = useLocation();
 
-        if (token) {
+        if (user) {
             const urlIntended: string = location.state?.from?.pathname || '/';
             return <Navigate to={urlIntended} replace />;
         }
@@ -29,10 +29,10 @@ export const Middleware = {
 
         console.info(`Session expires in: ${expiresIn} minutes`);
 
-        if (expiresAt.isBefore(moment())) {
-            dispatch(logout());
+        if (moment().add(3, 'm').isAfter(expiresAt)) {
+            dispatch(login({ phone: String(user.phone), store_no: String(user.store_no) }));
 
-            return <Navigate to="/login" state={{ from: location }} replace />;
+            // return <Navigate to="/login" state={{ from: location }} replace />;
         }
 
         return component;

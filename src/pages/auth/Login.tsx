@@ -24,7 +24,7 @@ const formSchema = yup.object({
 const Login = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const { token, isError, isSuccess, isLoading, message } = useAuth();
+    const { user, isError, isSuccess, isLoading, message } = useAuth();
     const form = useForm<LoginRequest>({
         resolver: yupResolver(formSchema),
         defaultValues: {
@@ -37,10 +37,10 @@ const Login = () => {
 
     useEffect(() => {
         if (isError) toast({ titleText: message, icon: 'error' });
-        if (isSuccess || token) navigate('/');
+        if (isSuccess || user) navigate('/');
 
         dispatch(reset());
-    }, [token, isError, isSuccess, message, navigate, dispatch]);
+    }, [user, isError, isSuccess, message, navigate, dispatch]);
 
     return (
         <Form {...form}>
@@ -85,8 +85,11 @@ const Login = () => {
                         </div>
                     </CardContent>
                     <CardFooter className={'flex-col'}>
-                        <Button type={'submit'} disabled={isLoading || !form.formState.isValid}
-                                className={'w-full bg-primary'}>
+                        <Button
+                            type={'submit'}
+                            disabled={isLoading || !form.formState.isValid}
+                            className={'w-full bg-primary'}
+                        >
                             {isLoading ? (
                                 <>
                                     Authenticating... <ReloadIcon className="ms-2 h-4 w-4 animate-spin" />

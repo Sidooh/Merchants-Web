@@ -1,22 +1,30 @@
 import { CONFIG } from '@/config';
-import axios, { AxiosError } from 'axios';
-import { Account, LoginRequest, LoginResponse } from '@/lib/types';
+import axios from 'axios';
+import { Account, ApiResponse, LoginRequest, LoginResponse } from '@/lib/types';
 
 export const authAPI = {
     login: async (data: LoginRequest) => {
         try {
-            const { data: { access_token: token } } = await axios.post<LoginResponse>(
-                `${CONFIG.services.accounts.api.url}/users/signin`,
-                { email: 'aa@a.a', password: '12345678' },
-            );
+            const {
+                data: { access_token: token },
+            } = await axios.post<LoginResponse>(`${CONFIG.services.accounts.api.url}/users/signin`, {
+                email: 'aa@a.a',
+                password: '12345678',
+            });
 
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-            const { data: { data: account } } = await axios.get<Account>(`${CONFIG.services.accounts.api.url}/accounts/phone/${data.phone}`);
+            const {
+                data: { data: account },
+            } = await axios.get<ApiResponse<Account>>(
+                `${CONFIG.services.accounts.api.url}/accounts/phone/${data.phone}`
+            );
 
             if (!account) throw new Error('Invalid credentials!');
 
-            const { data: { data: merchant } } = await axios.get(`${CONFIG.services.merchants.api.url}/merchants/account/${account.id}`);
+            const {
+                data: { data: merchant },
+            } = await axios.get(`${CONFIG.services.merchants.api.url}/merchants/account/${account.id}`);
 
             if (merchant.code !== data.store_no) throw new Error('Invalid credentials!');
 
