@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { authAPI } from './authApi';
-import { LoginRequest } from '@/lib/types.ts';
+import { LoginRequest, OTPRequest } from '@/lib/types.ts';
 
 export type AuthState = {
-    user: {
+    user?: {
         token: string;
         name: string;
         business_name: string;
@@ -11,6 +11,7 @@ export type AuthState = {
         merchant_id: number;
         phone: number;
         store_no: number;
+        has_otp?: boolean;
     };
 
     isError: boolean;
@@ -30,6 +31,14 @@ const initialState: AuthState = {
 export const login = createAsyncThunk('auth/login', async (user: LoginRequest, thunkAPI) => {
     try {
         return await authAPI.login(user);
+    } catch (err: unknown) {
+        return thunkAPI.rejectWithValue((err as { message: string }).message);
+    }
+});
+
+export const verifyOTP = createAsyncThunk('auth/verifyOTP', async (data: OTPRequest, thunkAPI) => {
+    try {
+        return await authAPI.verifyOTP(data);
     } catch (err: unknown) {
         return thunkAPI.rejectWithValue((err as { message: string }).message);
     }
@@ -66,6 +75,22 @@ export const authSlice = createSlice({
                 state.message = String(action.payload);
                 state.user = undefined;
             })
+
+            .addCase(verifyOTP.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(verifyOTP.fulfilled, (state, action) => {
+                if (state.user) state.user.has_otp = Boolean(action.payload);
+                state.isLoading = false;
+                state.isSuccess = true;
+            })
+            .addCase(verifyOTP.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.message = String(action.payload);
+                if (state.user) state.user.has_otp = false;
+            })
+
             .addCase(logout.fulfilled, (state) => {
                 state.user = undefined;
             });

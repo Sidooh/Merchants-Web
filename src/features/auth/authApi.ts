@@ -1,6 +1,6 @@
 import { CONFIG } from '@/config';
 import axios from 'axios';
-import { Account, ApiResponse, LoginRequest, LoginResponse } from '@/lib/types';
+import { Account, ApiResponse, LoginRequest, LoginResponse, OTPRequest } from '@/lib/types';
 import { AuthState } from '@/features/auth/authSlice.ts';
 
 export const authAPI = {
@@ -37,12 +37,13 @@ export const authAPI = {
                 business_name: merchant.business_name,
                 phone: account.phone,
                 store_no: merchant.code,
+                has_otp: data.is_refresh_token,
             };
 
             localStorage.setItem('user', JSON.stringify(user));
 
             return user;
-        } catch (err: unknown) {
+        } catch (err: any) {
             if (axios.isAxiosError(err)) {
                 if (err.response?.status && [400, 422].includes(err.response?.status) && Boolean(err.response?.data)) {
                     if (Array.isArray(err.response?.data.errors)) throw new Error(err.response?.data.errors[0].message);
@@ -52,6 +53,42 @@ export const authAPI = {
                     throw new Error('Invalid credentials!');
                 } else if (err.response?.status === 429) {
                     throw new Error('Sorry! We failed to sign you in. Please try again in a few minutes.');
+                } else if (err.code === 'ERR_NETWORK') {
+                    throw new Error('Network Error! Service unavailable.');
+                } else {
+                    throw new Error('Something went wrong!');
+                }
+            } else {
+                throw new Error(err.message);
+                console.error('Unexpected errors:', err);
+            }
+        }
+    },
+    verifyOTP: async (data: OTPRequest) => {
+        try {
+            console.log(data);
+
+            const user: AuthState['user'] = JSON.parse(String(localStorage.getItem('user')));
+
+            localStorage.setItem(
+                'user',
+                JSON.stringify({
+                    ...user,
+                    has_otp: true,
+                })
+            );
+
+            return true;
+        } catch (err: any) {
+            if (axios.isAxiosError(err)) {
+                if (err.response?.status && [400, 422].includes(err.response?.status) && Boolean(err.response?.data)) {
+                    if (Array.isArray(err.response?.data.errors)) throw new Error(err.response?.data.errors[0].message);
+
+                    throw new Error(err.response?.data.errors.message);
+                } else if (err.response?.status === 401 && err.response.data) {
+                    throw new Error('Invalid pin!');
+                } else if (err.response?.status === 429) {
+                    throw new Error('Sorry! We failed to verify your pin. Please try again in a few minutes.');
                 } else if (err.code === 'ERR_NETWORK') {
                     throw new Error('Network Error! Service unavailable.');
                 } else {
