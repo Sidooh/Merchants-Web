@@ -1,6 +1,7 @@
 import { CONFIG } from '@/config';
 import axios from 'axios';
 import { Account, ApiResponse, LoginRequest, LoginResponse } from '@/lib/types';
+import { AuthState } from '@/features/auth/authSlice.ts';
 
 export const authAPI = {
     login: async (data: LoginRequest) => {
@@ -28,10 +29,12 @@ export const authAPI = {
 
             if (merchant.code !== data.store_no) throw new Error('Invalid credentials!');
 
-            const user = {
+            const user: AuthState['user'] = {
                 token: token,
                 account_id: account.id,
                 merchant_id: merchant.id,
+                name: `${merchant.first_name} ${merchant.last_name}`,
+                business_name: merchant.business_name,
                 phone: account.phone,
                 store_no: merchant.code,
             };

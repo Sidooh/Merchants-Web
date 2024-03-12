@@ -9,13 +9,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx';
-import { useAppDispatch } from '@/app/store.ts';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar.tsx';
 import { cn } from '@/lib/utils.ts';
 import { ModeToggle } from '@/components/ModeToggle.tsx';
 import { useAuth } from '@/hooks/useAuth.ts';
+import { logout, reset } from '@/features/auth/authSlice';
+import { useAppDispatch } from '@/app/store.ts';
 
 const Header = () => {
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+
     const [showMobileMenu, setShowMobileMenu] = useState<boolean>(false);
 
     const { user } = useAuth();
@@ -36,6 +40,13 @@ const Header = () => {
         return () => window.removeEventListener('scroll', setDropShadow);
     }, []);
 
+    const handleSignOut = () => {
+        dispatch(logout());
+        dispatch(reset());
+
+        navigate('/login');
+    };
+
     return (
         <header
             className={cn('sticky top-0 z-40 bg-background', {
@@ -55,7 +66,6 @@ const Header = () => {
                         {showMobileMenu ? <FaX /> : <Logo />}
                         <span className="font-bold">Menu</span>
                     </button>
-                    {showMobileMenu && <MobileNav />}
                 </div>
 
                 <div className={'flex items-center space-x-2'}>
@@ -73,8 +83,10 @@ const Header = () => {
                         <DropdownMenuContent align="end">
                             <div className="flex items-center justify-start gap-2 p-2">
                                 <div className="flex flex-col space-y-1 leading-none">
-                                    <p className="font-medium">Store No.:</p>
-                                    <p className="w-[200px] truncate text-sm text-muted-foreground">{user.store_no}</p>
+                                    <p className="font-medium">{user.name}</p>
+                                    <p className="md:w-[200px] truncate text-xs text-muted-foreground">
+                                        {user.business_name}
+                                    </p>
                                 </div>
                             </div>
                             <DropdownMenuSeparator />
@@ -82,6 +94,8 @@ const Header = () => {
                                 className="cursor-pointer"
                                 onSelect={(e) => {
                                     e.preventDefault();
+
+                                    handleSignOut();
                                 }}
                             >
                                 Sign out
