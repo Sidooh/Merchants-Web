@@ -15,9 +15,7 @@ const MainLayout = () => {
                 const id = hash.replace('#', '');
                 const element = document.getElementById(id);
 
-                if (element) {
-                    element.scrollIntoView({ block: 'start', behavior: 'smooth' });
-                }
+                if (element) element.scrollIntoView({ block: 'start', behavior: 'smooth' });
             }
         }, 0);
     }, [hash]);
@@ -27,18 +25,17 @@ const MainLayout = () => {
     }, [pathname]);
 
     return (
-        <div className="flex min-h-screen flex-col space-y-6">
+        <div className="flex min-h-screen flex-col space-y-1">
             <Header />
 
-            <div className="container min-h-screen relative pb-12">
+            <div className="container min-h-screen relative pb-6">
                 <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => window.location.reload()}>
                     <Suspense fallback={<PageLoader />}>
                         <Outlet />
                     </Suspense>
                 </ErrorBoundary>
-
-                <Footer />
             </div>
+            <Footer />
         </div>
     );
 };

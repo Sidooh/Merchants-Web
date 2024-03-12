@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { authAPI } from './authApi';
+import { authApi } from './authApi';
 import { LoginRequest, OTPRequest } from '@/lib/types.ts';
 
 export type AuthState = {
@@ -30,7 +30,7 @@ const initialState: AuthState = {
 
 export const login = createAsyncThunk('auth/login', async (user: LoginRequest, thunkAPI) => {
     try {
-        return await authAPI.login(user);
+        return await authApi.login(user);
     } catch (err: unknown) {
         return thunkAPI.rejectWithValue((err as { message: string }).message);
     }
@@ -38,14 +38,14 @@ export const login = createAsyncThunk('auth/login', async (user: LoginRequest, t
 
 export const verifyOTP = createAsyncThunk('auth/verifyOTP', async (data: OTPRequest, thunkAPI) => {
     try {
-        return await authAPI.verifyOTP(data);
+        return await authApi.verifyOTP(data);
     } catch (err: unknown) {
         return thunkAPI.rejectWithValue((err as { message: string }).message);
     }
 });
 
 export const logout = createAsyncThunk('auth/logout', async () => {
-    authAPI.logout();
+    authApi.logout();
 });
 
 export const authSlice = createSlice({

@@ -1,9 +1,9 @@
 import { CONFIG } from '@/config';
 import axios from 'axios';
-import { Account, ApiResponse, LoginRequest, LoginResponse, OTPRequest } from '@/lib/types';
+import { Account, ApiResponse, LoginRequest, LoginResponse, NotifyRequest, OTPRequest } from '@/lib/types';
 import { AuthState } from '@/features/auth/authSlice.ts';
 
-export const authAPI = {
+export const authApi = {
     login: async (data: LoginRequest) => {
         try {
             const {
@@ -42,6 +42,8 @@ export const authAPI = {
 
             localStorage.setItem('user', JSON.stringify(user));
 
+            await authApi.sendOTP(user);
+
             return user;
         } catch (err: any) {
             if (axios.isAxiosError(err)) {
@@ -64,21 +66,43 @@ export const authAPI = {
             }
         }
     },
+    sendOTP: async (user: AuthState['user']) => {
+        // Generate a 6-digit random number
+        const otp = Math.floor(Math.random() * 1000000)
+            .toString()
+            .padStart(6, '0');
+
+        // Store OTP in local storage (replace with your preferred storage mechanism)
+        localStorage.setItem('otp', otp);
+
+        // Send OTP to user via SMS
+        await axios.post<any, any, NotifyRequest>(
+            `${CONFIG.services.notify.api.url}/notifications`,
+            {
+                channel: 'SMS',
+                content: `Your Sidooh verification code is ${otp}.\n`,
+                destination: 254110039317,
+            },
+            { headers: { Authorization: `Bearer ${user?.token}` } }
+        );
+
+        return otp;
+    },
     verifyOTP: async (data: OTPRequest) => {
         try {
-            console.log(data);
+            const storedOtp = localStorage.getItem('otp');
 
+            if (!storedOtp) throw new Error('Something went wrong!');
+
+            // Clear OTP from local storage after verification
+            localStorage.removeItem('otp');
+
+            const has_otp = storedOtp === data.pin;
             const user: AuthState['user'] = JSON.parse(String(localStorage.getItem('user')));
 
-            localStorage.setItem(
-                'user',
-                JSON.stringify({
-                    ...user,
-                    has_otp: true,
-                })
-            );
+            localStorage.setItem('user', JSON.stringify({ ...user, has_otp }));
 
-            return true;
+            return has_otp;
         } catch (err: any) {
             if (axios.isAxiosError(err)) {
                 if (err.response?.status && [400, 422].includes(err.response?.status) && Boolean(err.response?.data)) {

@@ -12,10 +12,12 @@ import { AiOutlineLogin } from 'react-icons/ai';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { toast } from '@/lib/utils.ts';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth.ts';
 import { useAppDispatch } from '@/app/store.ts';
 import { reset, verifyOTP } from '@/features/auth/authSlice.ts';
+import { BiRotateLeft } from 'react-icons/bi';
+import { authApi } from '@/features/auth/authApi.ts';
 
 const formSchema = yup.object({
     pin: yup.string().min(6, 'Your one-time password must be 6 digits.').required(),
@@ -25,6 +27,8 @@ const OTP = () => {
     const { user, isError, isSuccess, isLoading, message } = useAuth();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const [timer, setTimer] = useState(5);
+    const [isLoadingOTP, setIsLoadingOTP] = useState(false);
 
     const form = useForm<OTPRequest>({
         resolver: yupResolver(formSchema),
@@ -43,6 +47,32 @@ const OTP = () => {
 
         dispatch(reset());
     }, [isSuccess, isError]);
+
+    const resendOTP = async () => {
+        setIsLoadingOTP(true);
+        setTimer(4);
+
+        try {
+            await authApi.sendOTP(user!);
+
+            toast({ titleText: 'A new OTP has been sent to your phone.' });
+
+            setIsLoadingOTP(false);
+        } catch (err: any) {
+            toast({ titleText: 'Something went wrong. Kindly contact admin.', icon: 'error' });
+
+            setIsLoadingOTP(false);
+        }
+    };
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (timer > 0) setTimer(timer - 1);
+            if (timer === 0) clearInterval(interval);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [timer]);
 
     const handleSubmit: SubmitHandler<OTPRequest> = async (data) => dispatch(verifyOTP(data));
 
@@ -92,21 +122,50 @@ const OTP = () => {
                             )}
                         />
 
-                        <Button
-                            type={'submit'}
-                            disabled={isLoading || !form.formState.isValid}
-                            className={'w-full bg-primary'}
-                        >
-                            {isLoading ? (
-                                <>
-                                    Verifying... <ReloadIcon className="ms-2 h-4 w-4 animate-spin" />
-                                </>
-                            ) : (
-                                <>
-                                    Verify <AiOutlineLogin className="ms-2 h-4 w-4" />
-                                </>
-                            )}
-                        </Button>
+                        <div className="grid grid-cols-3 gap-3">
+                            <Button
+                                type={'submit'}
+                                disabled={isLoading || !form.formState.isValid}
+                                className={'col-span-2'}
+                            >
+                                {isLoading ? (
+                                    <>
+                                        Verifying... <ReloadIcon className="ms-2 h-4 w-4 animate-spin" />
+                                    </>
+                                ) : (
+                                    <>
+                                        Verify <AiOutlineLogin className="ms-2 h-4 w-4" />
+                                    </>
+                                )}
+                            </Button>
+                            <Button
+                                variant={'ghost'}
+                                className={'gap-2 items-center'}
+                                disabled={timer > 0}
+                                onClick={resendOTP}
+                            >
+                                {isLoadingOTP ? (
+                                    <>
+                                        Resending... <ReloadIcon className="ms-2 h-4 w-4 animate-spin" />
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>Resend</span>
+                                        {timer > 0 ? (
+                                            <small
+                                                className={
+                                                    'border-s-2 border-e-2 border-red-500 p-1 w-7 h-7 rounded-full'
+                                                }
+                                            >
+                                                {timer}s
+                                            </small>
+                                        ) : (
+                                            <BiRotateLeft className="ms-2 h-4 w-4" />
+                                        )}
+                                    </>
+                                )}
+                            </Button>
+                        </div>
                     </form>
                 </Form>
             </CardContent>

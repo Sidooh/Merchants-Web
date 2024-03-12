@@ -3,10 +3,10 @@ import Transactions from './components/Transactions';
 
 const Default = () => {
     return (
-        <div className={'grid grid-cols-3 justify-center gap-3'}>
+        <div className={'grid grid-cols-1 lg:grid-cols-3 justify-center gap-3'}>
             <FloatPurchaseForm />
 
-            <div className="col-span-2">
+            <div className="lg:col-span-2">
                 <Transactions />
             </div>
         </div>
