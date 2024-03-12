@@ -107,3 +107,10 @@ export type PinConfirmationRequest = {
     account_id: number;
     pin: string;
 };
+
+export type NotifyRequest = {
+    channel: string;
+    destination: number | number[];
+    event_type?: string;
+    content: string;
+};

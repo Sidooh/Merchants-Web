@@ -169,7 +169,7 @@ const FloatPurchaseForm = () => {
         }
     };
 
-    if (isLoadingStores) return <Skeleton className={'h-[25rem] w-2/5'} />;
+    if (isLoadingStores) return <Skeleton className={'h-[25rem]'} />;
 
     return (
         <>

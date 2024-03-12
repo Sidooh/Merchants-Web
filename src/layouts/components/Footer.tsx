@@ -8,19 +8,17 @@ const Footer = () => {
     const month = today.toLocaleDateString('en-US', { month: 'long' });
 
     return (
-        <footer className="absolute bottom-0 w-full">
-            <div className="flex justify-between text-xs mt-4 mb-3">
-                <p className="mb-0 text-600">
-                    {CONFIG.app.name} |{' '}
-                    <a href="/public" className={'text-primary'}>
-                        Sidooh
-                    </a>{' '}
-                    <br className="sm:hidden" /> &copy; {new Date().getFullYear()}
-                </p>
-                <p className="mb-0 text-600">
-                    v{CONFIG.app.version} | `${day}, ${date} ${month}`
-                </p>
-            </div>
+        <footer className="flex justify-between text-xs pb-3 container">
+            <p className="text-600 flex gap-1">
+                {CONFIG.app.name} |
+                <a href="/public" className={'text-primary'}>
+                    Sidooh
+                </a>
+                &copy; {new Date().getFullYear()}
+            </p>
+            <p className="text-600">
+                v{CONFIG.app.version} | {day}, {date} {month}
+            </p>
         </footer>
     );
 };

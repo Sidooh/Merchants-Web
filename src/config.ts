@@ -15,8 +15,8 @@ export const CONFIG = {
             },
         },
         notify: {
-            dashboard: {
-                url: import.meta.env.VITE_NOTIFY_DASHBOARD_URL,
+            api: {
+                url: import.meta.env.VITE_NOTIFY_API_URL,
             },
         },
     },
