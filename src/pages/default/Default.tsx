@@ -1,11 +1,14 @@
 import FloatPurchaseForm from '@/pages/default/components/FloatPurchaseForm.tsx';
-import { useAuth } from '@/hooks/useAuth.ts';
-import { useGetMpesaStoresQuery } from '@/services/merchantsApi.ts';
+import Transactions from './components/Transactions';
 
 const Default = () => {
     return (
-        <div className={'flex justify-center md:mt-20'}>
+        <div className={'grid grid-cols-3 justify-center gap-3'}>
             <FloatPurchaseForm />
+
+            <div className="col-span-2">
+                <Transactions />
+            </div>
         </div>
     );
 };
