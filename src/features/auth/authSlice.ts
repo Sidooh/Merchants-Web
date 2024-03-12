@@ -5,11 +5,13 @@ import { LoginRequest } from '@/lib/types.ts';
 export type AuthState = {
     user: {
         token: string;
+        name: string;
+        business_name: string;
         account_id: number;
         merchant_id: number;
         phone: number;
-        store_no: number
-    }
+        store_no: number;
+    };
 
     isError: boolean;
     isSuccess: boolean;

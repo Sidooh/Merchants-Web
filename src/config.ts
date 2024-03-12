@@ -1,6 +1,6 @@
 export const CONFIG = {
     app: {
-        name: 'Merchants Web',
+        name: 'Merchants',
         version: 1.0,
     },
     services: {

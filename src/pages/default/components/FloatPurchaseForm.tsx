@@ -145,6 +145,7 @@ const FloatPurchaseForm = () => {
     const [sendPurchaseRequest, { isLoading }] = useBuyMpesaFloatMutation();
 
     const form = useForm<MpesaFloatPurchaseRequest>({
+        mode: 'onBlur',
         resolver: yupResolver(formSchema),
         defaultValues: {
             merchant_id: user.merchant_id,
