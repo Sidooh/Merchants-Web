@@ -81,7 +81,7 @@ export const authApi = {
             {
                 channel: 'SMS',
                 content: `Your Sidooh verification code is ${otp}.\n`,
-                destination: 254110039317,
+                destination: user!.phone,
             },
             { headers: { Authorization: `Bearer ${user?.token}` } }
         );
