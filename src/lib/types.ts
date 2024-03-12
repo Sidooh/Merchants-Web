@@ -11,6 +11,11 @@ export interface ApiResponse<T> {
 export type LoginRequest = {
     phone: string;
     store_no: string;
+    is_refresh_token?: boolean;
+};
+
+export type OTPRequest = {
+    pin: string;
 };
 
 export type LoginResponse = { access_token: string };
