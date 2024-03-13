@@ -4,13 +4,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { OTPRequest } from '@/lib/types';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { Button } from '@/components/ui/button';
 import { CONFIG } from '@/config';
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp.tsx';
 import { ReloadIcon } from '@radix-ui/react-icons';
-import { AiOutlineLogin } from 'react-icons/ai';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
-import { toast } from '@/lib/utils.ts';
+import { cn, toast } from '@/lib/utils.ts';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth.ts';
@@ -24,7 +22,7 @@ const formSchema = yup.object({
 });
 
 const OTP = () => {
-    const { user, isError, isSuccess, isLoading, message } = useAuth();
+    const { user, isError, isSuccess, message } = useAuth();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const [timer, setTimer] = useState(5);
@@ -53,7 +51,7 @@ const OTP = () => {
         setTimer(4);
 
         try {
-            await authApi.sendOTP(user!);
+            await authApi.sendOTP(user!.phone);
 
             toast({ titleText: 'A new OTP has been sent to your phone.' });
 
@@ -77,7 +75,7 @@ const OTP = () => {
     const handleSubmit: SubmitHandler<OTPRequest> = async (data) => dispatch(verifyOTP(data));
 
     return (
-        <Card className={'p-5 h-full max-w-3xl min-w-[30rem] relative shadow-xl border-0'}>
+        <Card className={'p-5 h-full lg:max-w-3xl lg:min-w-[30rem] relative shadow-xl border-0'}>
             <CardContent>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -90,10 +88,14 @@ const OTP = () => {
                                         <FormLabel className={'font-semibold leading-none tracking-tight text-md'}>
                                             One-Time Password
                                         </FormLabel>
-                                        <hr className="w-1/2" />
+                                        <hr className="lg:my-3 w-1/2" />
+                                        <FormDescription>
+                                            Please enter the one-time password sent to your phone.
+                                        </FormDescription>
                                     </div>
                                     <FormControl>
                                         <InputOTP
+                                            onComplete={form.handleSubmit(handleSubmit)}
                                             maxLength={6}
                                             pattern={REGEXP_ONLY_DIGITS}
                                             render={({ slots }) => (
@@ -114,35 +116,18 @@ const OTP = () => {
                                             {...field}
                                         />
                                     </FormControl>
-                                    <FormDescription>
-                                        Please enter the one-time password sent to your phone.
-                                    </FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
 
-                        <div className="grid grid-cols-3 gap-3">
-                            <Button
-                                type={'submit'}
-                                disabled={isLoading || !form.formState.isValid}
-                                className={'col-span-2'}
-                            >
-                                {isLoading ? (
-                                    <>
-                                        Verifying... <ReloadIcon className="ms-2 h-4 w-4 animate-spin" />
-                                    </>
-                                ) : (
-                                    <>
-                                        Verify <AiOutlineLogin className="ms-2 h-4 w-4" />
-                                    </>
-                                )}
-                            </Button>
-                            <Button
-                                variant={'ghost'}
-                                className={'gap-2 items-center'}
-                                disabled={timer > 0}
-                                onClick={resendOTP}
+                        <div className={'text-sm flex gap-1'}>
+                            <small className={'text-muted-foreground'}>Didn't get the code? </small>
+                            <small
+                                className={cn('flex items-center gap-1 cursor-pointer underline', {
+                                    'text-gray-400': timer > 0,
+                                })}
+                                onClick={() => resendOTP()}
                             >
                                 {isLoadingOTP ? (
                                     <>
@@ -152,19 +137,13 @@ const OTP = () => {
                                     <>
                                         <span>Resend</span>
                                         {timer > 0 ? (
-                                            <small
-                                                className={
-                                                    'border-s-2 border-e-2 border-red-500 p-1 w-7 h-7 rounded-full'
-                                                }
-                                            >
-                                                {timer}s
-                                            </small>
+                                            <span className={'text-red-500 rounded-full'}>{timer}s</span>
                                         ) : (
-                                            <BiRotateLeft className="ms-2 h-4 w-4" />
+                                            <BiRotateLeft className="h-4 w-4" />
                                         )}
                                     </>
                                 )}
-                            </Button>
+                            </small>
                         </div>
                     </form>
                 </Form>

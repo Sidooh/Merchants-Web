@@ -4,7 +4,7 @@ import { Account, ApiResponse, LoginRequest, LoginResponse, NotifyRequest, OTPRe
 import { AuthState } from '@/features/auth/authSlice.ts';
 
 export const authApi = {
-    login: async (data: LoginRequest) => {
+    authenticateService: async (): Promise<string | undefined> => {
         try {
             const {
                 data: { access_token: token },
@@ -14,6 +14,19 @@ export const authApi = {
             });
 
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+            localStorage.setItem('token', JSON.stringify(token));
+
+            return token;
+        } catch (e: any) {
+            console.log(e);
+
+            return undefined;
+        }
+    },
+    login: async (data: LoginRequest) => {
+        try {
+            await authApi.authenticateService();
 
             const {
                 data: { data: account },
@@ -30,7 +43,6 @@ export const authApi = {
             if (merchant.code !== data.store_no) throw new Error('Invalid credentials!');
 
             const user: AuthState['user'] = {
-                token: token,
                 account_id: account.id,
                 merchant_id: merchant.id,
                 name: `${merchant.first_name} ${merchant.last_name}`,
@@ -42,7 +54,7 @@ export const authApi = {
 
             localStorage.setItem('user', JSON.stringify(user));
 
-            await authApi.sendOTP(user);
+            await authApi.sendOTP(user.phone);
 
             return user;
         } catch (err: any) {
@@ -62,11 +74,10 @@ export const authApi = {
                 }
             } else {
                 throw new Error(err.message);
-                console.error('Unexpected errors:', err);
             }
         }
     },
-    sendOTP: async (user: AuthState['user']) => {
+    sendOTP: async (phone: number, tries = 0) => {
         // Generate a 6-digit random number
         const otp = Math.floor(Math.random() * 1000000)
             .toString()
@@ -76,15 +87,19 @@ export const authApi = {
         localStorage.setItem('otp', otp);
 
         // Send OTP to user via SMS
-        await axios.post<any, any, NotifyRequest>(
-            `${CONFIG.services.notify.api.url}/notifications`,
-            {
+        try {
+            await axios.post<any, any, NotifyRequest>(`${CONFIG.services.notify.api.url}/notifications`, {
                 channel: 'SMS',
                 content: `Your Sidooh verification code is ${otp}.\n`,
-                destination: user!.phone,
-            },
-            { headers: { Authorization: `Bearer ${user?.token}` } }
-        );
+                // destination: phone,
+                destination: 254110039317,
+            });
+        } catch (e: any) {
+            if (axios.isAxiosError(e) && e.response?.status === 401 && tries < 2) {
+                await authApi.authenticateService();
+                await authApi.sendOTP(phone, tries + 1);
+            }
+        }
 
         return otp;
     },
@@ -92,7 +107,7 @@ export const authApi = {
         try {
             const storedOtp = localStorage.getItem('otp');
 
-            if (!storedOtp) throw new Error('Something went wrong!');
+            if (!storedOtp) throw new Error('Invalid OTP!');
 
             // Clear OTP from local storage after verification
             localStorage.removeItem('otp');
@@ -104,24 +119,8 @@ export const authApi = {
 
             return has_otp;
         } catch (err: any) {
-            if (axios.isAxiosError(err)) {
-                if (err.response?.status && [400, 422].includes(err.response?.status) && Boolean(err.response?.data)) {
-                    if (Array.isArray(err.response?.data.errors)) throw new Error(err.response?.data.errors[0].message);
-
-                    throw new Error(err.response?.data.errors.message);
-                } else if (err.response?.status === 401 && err.response.data) {
-                    throw new Error('Invalid pin!');
-                } else if (err.response?.status === 429) {
-                    throw new Error('Sorry! We failed to verify your pin. Please try again in a few minutes.');
-                } else if (err.code === 'ERR_NETWORK') {
-                    throw new Error('Network Error! Service unavailable.');
-                } else {
-                    throw new Error('Something went wrong!');
-                }
-            } else {
-                throw new Error(err.message);
-                console.error('Unexpected errors:', err);
-            }
+            console.error('Unexpected errors:', err);
+            throw new Error(err.message);
         }
     },
     logout: () => localStorage.removeItem('user'),
