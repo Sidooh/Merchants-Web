@@ -19,7 +19,7 @@ import { SAFARICOM_REGEX } from '@/constants';
 
 const formSchema = yup.object({
     phone: yup.string().matches(SAFARICOM_REGEX, { message: 'Invalid phone number' }).required('Phone is required.'),
-    store_no: yup.string().max(20).required('Store code is required.'),
+    store_no: yup.string().max(20).required('Sidooh Store number is required.'),
 });
 
 const Login = () => {
@@ -77,7 +77,7 @@ const Login = () => {
                                 <FormItem>
                                     <FormControl>
                                         <Input
-                                            placeholder="Enter store number"
+                                            placeholder="Enter Sidooh store number"
                                             type={'number'}
                                             {...form.register('store_no')}
                                         />
