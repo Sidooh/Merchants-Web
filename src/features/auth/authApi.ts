@@ -91,8 +91,8 @@ export const authApi = {
             await axios.post<any, any, NotifyRequest>(`${CONFIG.services.notify.api.url}/notifications`, {
                 channel: 'SMS',
                 content: `Your Sidooh verification code is ${otp}.\n`,
-                // destination: phone,
-                destination: 254110039317,
+                destination: phone,
+                // destination: 254110039317,
             });
         } catch (e: any) {
             if (axios.isAxiosError(e) && e.response?.status === 401 && tries < 2) {
