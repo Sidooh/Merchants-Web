@@ -237,23 +237,6 @@ const FloatPurchaseForm = () => {
                                 <div className="grid grid-cols-2 gap-3">
                                     <FormField
                                         control={form.control}
-                                        name="store"
-                                        render={() => (
-                                            <FormItem>
-                                                <FormLabel>Store Number</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        placeholder="xxxxxx"
-                                                        type={'number'}
-                                                        {...form.register('store')}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
                                         name="agent"
                                         render={() => (
                                             <FormItem>
@@ -263,6 +246,23 @@ const FloatPurchaseForm = () => {
                                                         placeholder="xxxxxx"
                                                         type={'number'}
                                                         {...form.register('agent')}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="store"
+                                        render={() => (
+                                            <FormItem>
+                                                <FormLabel>Store Number</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        placeholder="xxxxxx"
+                                                        type={'number'}
+                                                        {...form.register('store')}
                                                     />
                                                 </FormControl>
                                                 <FormMessage />

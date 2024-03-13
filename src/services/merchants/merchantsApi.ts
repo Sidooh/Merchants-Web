@@ -1,17 +1,17 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { CONFIG } from '@/config';
-import { RootState } from '@/app/store';
+import { getAuthToken } from '@/lib/utils.ts';
 
 export const merchantsApi = createApi({
     reducerPath: 'merchantsApi',
-    tagTypes: ['Merchant', 'Transaction'],
+    tagTypes: ['Merchant', 'Transaction', 'MpesaStore'],
     keepUnusedDataFor: 60 * 7, //  Seven Minutes
     baseQuery: fetchBaseQuery({
         baseUrl: CONFIG.services.merchants.api.url,
-        prepareHeaders: (headers, { getState }) => {
-            const { user } = (getState() as RootState)?.auth;
+        prepareHeaders: async (headers) => {
+            const token = await getAuthToken();
 
-            if (user?.token) headers.set('Authorization', `Bearer ${user?.token}`);
+            if (token) headers.set('Authorization', `Bearer ${token}`);
 
             return headers;
         },

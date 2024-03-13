@@ -4,7 +4,6 @@ import { LoginRequest, OTPRequest } from '@/lib/types.ts';
 
 export type AuthState = {
     user?: {
-        token: string;
         name: string;
         business_name: string;
         account_id: number;

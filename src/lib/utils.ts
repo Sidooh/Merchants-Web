@@ -5,6 +5,7 @@ import { Status } from '@/lib/enums.ts';
 import { IconType } from 'react-icons';
 import { FaCalendarXmark, FaCheck, FaCircleExclamation, FaCircleInfo, FaHourglassStart } from 'react-icons/fa6';
 import moment from 'moment';
+import { authApi } from '@/features/auth/authApi.ts';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -106,3 +107,27 @@ export const currencyFormat = (number?: number, currency = 'KES', decimals = 2):
         maximumFractionDigits: decimals,
     }).format(n);
 };
+
+export const getAuthToken = async () => {
+    let token = JSON.parse(String(localStorage.getItem('token')));
+
+    const expiresAt = moment.unix(decodeJWT(token).exp);
+    const expiresIn = expiresAt.diff(moment(), 'minutes');
+
+    console.info(`Session expires in: ${expiresIn} minutes`);
+
+    if (moment().add(3, 'm').isAfter(expiresAt)) {
+        token = await authApi.authenticateService();
+    }
+
+    return token;
+};
+
+export function providesList<R extends { id: string | number }[], T extends string>(
+    resultsWithIds: R | undefined,
+    tagType: T
+) {
+    return resultsWithIds
+        ? [{ type: tagType, id: 'LIST' }, ...resultsWithIds.map(({ id }) => ({ type: tagType, id }))]
+        : [{ type: tagType, id: 'LIST' }];
+}
