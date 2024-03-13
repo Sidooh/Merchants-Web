@@ -78,6 +78,10 @@
     }
 }
 
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
 .bg-card-holder {
     background-size: contain;
     background-position: right;
