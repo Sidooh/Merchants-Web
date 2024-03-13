@@ -31,7 +31,7 @@ const formSchema = yup.object({
     merchant_id: yup.number().integer().required(),
     agent: yup.string().required('Agent number is required.'),
     store: yup.string().required('Store number is required.'),
-    amount: yup.number().integer().required('Amount is required.'),
+    amount: yup.number().typeError('Must be an integer').integer().required('Amount is required.'),
     method: yup
         .string()
         .oneOf(Object.values(PaymentMethod), 'Method must be MPESA or VOUCHER')
@@ -186,7 +186,7 @@ const FloatPurchaseForm = () => {
                                 control={form.control}
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Select Store</FormLabel>
+                                        <FormLabel>Store</FormLabel>
                                         <div className="grid grid-cols-3 gap-3">
                                             <Select
                                                 onValueChange={(v) => {
