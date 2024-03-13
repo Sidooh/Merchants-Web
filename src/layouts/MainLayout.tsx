@@ -28,7 +28,7 @@ const MainLayout = () => {
         <div className="flex min-h-screen flex-col space-y-1">
             <Header />
 
-            <div className="container min-h-screen relative pb-6">
+            <div className="px-3 lg:px-0 lg:container min-h-screen relative pb-6">
                 <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => window.location.reload()}>
                     <Suspense fallback={<PageLoader />}>
                         <Outlet />
