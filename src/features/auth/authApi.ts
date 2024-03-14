@@ -54,7 +54,7 @@ export const authApi = {
 
             localStorage.setItem('user', JSON.stringify(user));
 
-            await authApi.sendOTP(user.phone);
+            authApi.sendOTP(user.phone);
 
             return user;
         } catch (err: any) {
