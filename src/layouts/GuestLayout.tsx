@@ -5,16 +5,16 @@ import { CONFIG } from '@/config.ts';
 import { IMAGES } from '@/constants/images';
 
 const GuestLayout = () => (
-    <div className={'flex flex-col relative items-center justify-center min-h-screen min-w-screen p-6'}>
+    <div className={'flex items-center justify-center min-h-screen p-6'}>
         <div className={'flex items-center justify-center mb-4 flex-col relative'}>
             <img
-                alt={''}
+                alt=""
                 className="hidden lg:block absolute end-[-8.75rem] top-[-5.125rem]"
                 src={IMAGES.icons.spotIllustrations.bg_shape}
                 width="250"
             />
             <img
-                alt={''}
+                alt=""
                 className="hidden lg:block absolute start-[-6.75rem] bottom-[-2.4375rem]"
                 src={IMAGES.icons.spotIllustrations.shape_1}
                 width="150"

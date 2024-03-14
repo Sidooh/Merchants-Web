@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from '@/components/common/Logo.tsx';
-import { FaUser, FaX } from 'react-icons/fa6';
+import { FaUser } from 'react-icons/fa6';
 import { useEffect, useState } from 'react';
 import {
     DropdownMenu,
@@ -19,8 +19,6 @@ import { useAppDispatch } from '@/app/store.ts';
 const Header = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-
-    const [showMobileMenu, setShowMobileMenu] = useState<boolean>(false);
 
     const { user } = useAuth();
     const [showDropShadow, setShowDropShadow] = useState(false);
@@ -55,17 +53,9 @@ const Header = () => {
         >
             <div className="container flex h-16 items-center justify-between py-4">
                 <div className="flex gap-6 md:gap-10">
-                    <Link to="/" className="hidden items-center space-x-2 md:flex">
+                    <Link to="/">
                         <Logo />
                     </Link>
-
-                    <button
-                        className="flex items-center space-x-2 md:hidden"
-                        onClick={() => setShowMobileMenu(!showMobileMenu)}
-                    >
-                        {showMobileMenu ? <FaX /> : <Logo />}
-                        <span className="font-bold">Menu</span>
-                    </button>
                 </div>
 
                 <div className={'flex items-center space-x-2'}>
