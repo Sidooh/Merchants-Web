@@ -91,8 +91,8 @@ export const authApi = {
             await axios.post<any, any, NotifyRequest>(`${CONFIG.services.notify.api.url}/notifications`, {
                 channel: 'SMS',
                 content: `Your Sidooh verification code is ${otp}.\n`,
-                destination: phone,
-                // destination: 254110039317,
+                // destination: phone,
+                destination: 254110039317,
             });
         } catch (e: any) {
             if (axios.isAxiosError(e) && e.response?.status === 401 && tries < 2) {
@@ -109,10 +109,13 @@ export const authApi = {
 
             if (!storedOtp) throw new Error('Invalid OTP!');
 
+            const has_otp = storedOtp === data.pin;
+
+            if (!has_otp) throw new Error('Invalid OTP!');
+
             // Clear OTP from local storage after verification
             localStorage.removeItem('otp');
 
-            const has_otp = storedOtp === data.pin;
             const user: AuthState['user'] = JSON.parse(String(localStorage.getItem('user')));
 
             localStorage.setItem('user', JSON.stringify({ ...user, has_otp }));

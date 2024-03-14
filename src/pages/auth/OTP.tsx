@@ -95,6 +95,7 @@ const OTP = () => {
                                     </div>
                                     <FormControl>
                                         <InputOTP
+                                            autoFocus
                                             onComplete={form.handleSubmit(handleSubmit)}
                                             maxLength={6}
                                             pattern={REGEXP_ONLY_DIGITS}
