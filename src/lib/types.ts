@@ -1,5 +1,5 @@
 import { ComponentType } from 'react';
-import { MerchantProduct, PaymentMethod, Status } from '@/lib/enums.ts';
+import { MerchantProduct, MerchantType, PaymentMethod, Status } from '@/lib/enums.ts';
 
 export interface ApiResponse<T> {
     result: 1 | 0;
@@ -60,7 +60,7 @@ export type Payment = Model & {
     charge: number;
     status: Status;
     description: string;
-    destination: { [key: string]: string };
+    destination: { agent: string; store: string; merchant_type: MerchantType };
 };
 
 export type Transaction = Model & {

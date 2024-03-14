@@ -26,7 +26,7 @@ const StatusBadge = ({ status, statuses = [], onStatusChange }: StatusChipType) 
 
     const BadgeEl = (
         <Badge
-            className={cn('px-1.5 md:px-2.5 py-0 md:py-0.5 space-x-1 pointer-events-none', {
+            className={cn('px-1.5 md:px-2.5 py-0 md:py-0.5 space-x-1 pointer-events-none rounded-full', {
                 'bg-[#c1fdad] text-[#1f7503]': [Status.COMPLETED, Status.ACTIVE, Status.PAID].includes(status),
                 'bg-[#ffe495] text-[#624900]': status === Status.PENDING,
                 'bg-[#ffa995] text-[#621200]': [Status.FAILED, Status.INACTIVE].includes(status),

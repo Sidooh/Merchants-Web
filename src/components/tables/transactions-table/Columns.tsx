@@ -1,7 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Transaction } from '@/lib/types.ts';
 import { currencyFormat, getRelativeDateAndTime, Str } from '@/lib/utils.ts';
-import { Actions } from '@/components/tables/transactions-table/Actions';
 import { Link } from 'react-router-dom';
 import StatusBadge from '@/components/common/StatusBadge.tsx';
 
@@ -55,9 +54,5 @@ export const columns: ColumnDef<Transaction>[] = [
                 </>
             );
         },
-    },
-    {
-        id: 'actions',
-        cell: ({ row }) => <Actions transaction={row.original} />,
     },
 ];
