@@ -104,8 +104,8 @@ export function DataTable<TData, TValue>({ title, columns, data, facetedFilters 
         <Card className="rounded-md border-0 p-3 lg:p-6 space-y-3">
             {title && (
                 <CardTitle className={'flex items-end flex-col'}>
-                    <p className="px-3">{title}</p>
-                    <hr className={'w-1/5 mt-2'} />
+                    <p className="text-xs lg:text-base lg:px-3">{title}</p>
+                    <hr className={'w-1/2 lg:w-1/5 mt-1'} />
                 </CardTitle>
             )}
             <DataTableToolbar
@@ -133,7 +133,7 @@ export function DataTable<TData, TValue>({ title, columns, data, facetedFilters 
                                             className="flex items-center -ml-4 h-8 px-3 data-[state=open]:bg-accent text-secondary-foreground hover:bg-secondary/80 cursor-pointer"
                                             onClick={header.column.getToggleSortingHandler()}
                                         >
-                                            <span className={'font-bold text-sm'}>
+                                            <span className={'font-bold text-xs md:text-sm'}>
                                                 {flexRender(header.column.columnDef.header, header.getContext())}
                                             </span>
                                             {header.column.getCanSort() &&
@@ -155,7 +155,7 @@ export function DataTable<TData, TValue>({ title, columns, data, facetedFilters 
                         table.getRowModel().rows.map((row) => (
                             <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                                 {row.getVisibleCells().map((cell) => (
-                                    <TableCell className={'p-1'} key={cell.id}>
+                                    <TableCell key={cell.id} className={'text-xs md:text-sm'}>
                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </TableCell>
                                 ))}
