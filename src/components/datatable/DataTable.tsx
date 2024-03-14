@@ -155,7 +155,7 @@ export function DataTable<TData, TValue>({ title, columns, data, facetedFilters 
                         table.getRowModel().rows.map((row) => (
                             <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                                 {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id} className={'text-xs md:text-sm'}>
+                                    <TableCell key={cell.id} className={'p-1 text-xs md:text-sm'}>
                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </TableCell>
                                 ))}
