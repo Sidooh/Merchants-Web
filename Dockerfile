@@ -10,7 +10,10 @@ WORKDIR /app
 COPY package.json yarn.lock .yarnrc.yml vite.config.ts tsconfig.json tsconfig.node.json index.html tailwind.config.ts postcss.config.js ./
 COPY src/ ./src/
 
-RUN yarn install --immutable
+RUN yarn install
+
+COPY . .
+
 RUN yarn run build
 
 

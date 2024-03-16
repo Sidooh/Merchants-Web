@@ -2,6 +2,7 @@
 
 dist
 cloud-sql-proxy
+node_modules
 
 # yarn v2
 .yarn/*
