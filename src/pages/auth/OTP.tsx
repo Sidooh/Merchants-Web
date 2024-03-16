@@ -25,7 +25,7 @@ const OTP = () => {
     const { user, isError, isSuccess, message } = useAuth();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const [timer, setTimer] = useState(5);
+    const [timer, setTimer] = useState(60);
     const [isLoadingOTP, setIsLoadingOTP] = useState(false);
 
     const form = useForm<OTPRequest>({
@@ -56,7 +56,7 @@ const OTP = () => {
             toast({ titleText: 'A new OTP has been sent to your phone.' });
 
             setIsLoadingOTP(false);
-        } catch (err: any) {
+        } catch (_: unknown) {
             toast({ titleText: 'Something went wrong. Kindly contact admin.', icon: 'error' });
 
             setIsLoadingOTP(false);
