@@ -1,6 +1,6 @@
 export const CONFIG = {
     app: {
-        name: 'Merchants',
+        name: "Merchant's Float",
         version: 1.0,
     },
     services: {
