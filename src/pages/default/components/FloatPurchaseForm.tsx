@@ -57,7 +57,7 @@ const PinConfirmationForm = ({
 }: {
     open: boolean;
     setOpen: Dispatch<SetStateAction<boolean>>;
-    onConfirmed: Function;
+    onConfirmed: () => void;
 }) => {
     const { user } = useAuth();
     const [checkPin, { isLoading }] = useCheckPinMutation();
@@ -73,11 +73,9 @@ const PinConfirmationForm = ({
         try {
             const isConfirmed = await checkPin(values).unwrap();
 
-            if (isConfirmed) {
-                onConfirmed();
-            }
+            if (isConfirmed) onConfirmed();
         } catch (e) {
-            toast({ titleText: 'Invalid Pin!', icon: 'warning' });
+            toast({ titleText: 'Invalid Pin!', icon: 'warning', position: 'center' });
         }
     };
 
@@ -105,9 +103,9 @@ const PinConfirmationForm = ({
                                 </FormItem>
                             )}
                         />
-                        <DialogFooter className="sm:justify-between">
+                        <DialogFooter className="sm:justify-between gap-y-3">
                             <DialogClose asChild>
-                                <Button type="button" variant="secondary">
+                                <Button type="button" variant="ghost">
                                     Cancel
                                 </Button>
                             </DialogClose>
