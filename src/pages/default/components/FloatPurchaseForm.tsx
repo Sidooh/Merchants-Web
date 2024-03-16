@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input.tsx';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
-import { CheckCircledIcon, CheckIcon, PlusIcon, ReloadIcon } from '@radix-ui/react-icons';
+import { CheckCircledIcon, CheckIcon, CrossCircledIcon, PlusIcon, ReloadIcon } from '@radix-ui/react-icons';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { MpesaFloatPurchaseRequest, MpesaStore, PinConfirmationRequest } from '@/lib/types.ts';
@@ -71,11 +71,11 @@ const PinConfirmationForm = ({
 
     const handleSubmit: SubmitHandler<PinConfirmationRequest> = async (values) => {
         try {
-            const isConfirmed = await checkPin(values).unwrap();
-
-            if (isConfirmed) onConfirmed();
+            if (await checkPin(values).unwrap()) onConfirmed();
         } catch (e) {
-            toast({ titleText: 'Invalid Pin!', icon: 'warning', position: 'center' });
+            toast({ titleText: 'Invalid Pin!', icon: 'warning', position: 'center', showCloseButton: true });
+
+            form.resetField('pin');
         }
     };
 
@@ -105,8 +105,8 @@ const PinConfirmationForm = ({
                         />
                         <DialogFooter className="sm:justify-between gap-y-3">
                             <DialogClose asChild>
-                                <Button type="button" variant="ghost">
-                                    Cancel
+                                <Button type="button" variant="ghost" className={'text-red-700'}>
+                                    Cancel <CrossCircledIcon className="ms-2 h-4 w-4" />
                                 </Button>
                             </DialogClose>
                             <Button type={'submit'} disabled={isLoading || !form.formState.isValid}>
@@ -151,10 +151,12 @@ const FloatPurchaseForm = () => {
     }, [stores]);
 
     const completePurchaseRequest = (values: MpesaFloatPurchaseRequest) => {
+        if (values.method === PaymentMethod.FLOAT) delete values['debit_account'];
+
         sendPurchaseRequest(values)
             .unwrap()
             .then(() => toast({ titleText: 'Purchase Initiated Successfully!' }))
-            .catch(() => toast({ titleText: 'Something went wrong. Please retry!' }));
+            .catch(() => toast({ titleText: 'Something went wrong. Please retry!', icon: 'error' }));
     };
 
     const handleSubmit: SubmitHandler<MpesaFloatPurchaseRequest> = async (values) => {
