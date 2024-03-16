@@ -15,7 +15,7 @@ const Transactions = () => {
     if (stores) {
         data = data.map((t) => {
             const store = stores.find(
-                (s) => s.agent === t.payment.destination.agent && s.store === t.payment.destination.store
+                (s) => s.agent === t.payment?.destination.agent && s.store === t.payment?.destination.store
             );
 
             if (store) return { ...t, destination: store.name };

@@ -70,7 +70,7 @@ export type Transaction = Model & {
     destination: string;
     merchant: number | Merchant;
     product: string;
-    payment: Payment;
+    payment?: Payment;
 };
 
 export type FacetedFilterType = {
