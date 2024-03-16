@@ -73,7 +73,7 @@ const PinConfirmationForm = ({
         try {
             if (await checkPin(values).unwrap()) onConfirmed();
         } catch (e) {
-            toast({ titleText: 'Invalid Pin!', icon: 'warning', position: 'center', showCloseButton: true });
+            toast({ titleText: 'Invalid Pin!', icon: 'warning', position: 'top', showCloseButton: true });
 
             form.resetField('pin');
         }
