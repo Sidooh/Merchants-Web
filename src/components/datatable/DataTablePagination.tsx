@@ -10,8 +10,8 @@ interface DataTablePaginationProps<TData> {
 
 export function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) {
     return (
-        <div className="flex items-center justify-between px-2 overflow-x-auto gap-3 text-nowrap text-xs md:text-sm">
-            <div className="flex-1 text-muted-foreground">
+        <div className="relative w-full overflow-x-auto flex items-center justify-between px-2 gap-3 text-nowrap text-xs md:text-sm">
+            <div className="text-muted-foreground">
                 {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
             </div>
             <div className="flex items-center space-x-6 lg:space-x-8">
