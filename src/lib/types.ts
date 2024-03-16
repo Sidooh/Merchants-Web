@@ -43,7 +43,7 @@ export type Merchant = Model & {
     phone: string;
 
     business_name: string;
-    code: number;
+    code: string;
     land_mark: string;
 };
 

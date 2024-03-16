@@ -3,28 +3,28 @@ import { authApi } from './authApi';
 import { LoginRequest, OTPRequest } from '@/lib/types.ts';
 
 export type AuthState = {
-    user?: {
-        name: string;
-        business_name: string;
-        account_id: number;
-        merchant_id: number;
-        phone: number;
-        store_no: number;
-        has_otp?: boolean;
-    };
-
     isError: boolean;
-    isSuccess: boolean;
     isLoading: boolean;
+    isSuccess: boolean;
     message: string;
+
+    user?: {
+        account_id: number;
+        business_name: string;
+        has_otp?: boolean;
+        merchant_id: number;
+        name: string;
+        phone: number;
+        store_no: string;
+    };
 };
 
 const initialState: AuthState = {
-    user: JSON.parse(String(localStorage.getItem('user'))),
     isError: false,
-    isSuccess: false,
     isLoading: false,
+    isSuccess: false,
     message: '',
+    user: JSON.parse(String(localStorage.getItem('user'))),
 };
 
 export const login = createAsyncThunk('auth/login', async (user: LoginRequest, thunkAPI) => {

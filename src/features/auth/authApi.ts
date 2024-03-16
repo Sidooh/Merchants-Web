@@ -1,6 +1,6 @@
 import { CONFIG } from '@/config';
 import axios from 'axios';
-import { Account, ApiResponse, LoginRequest, LoginResponse, NotifyRequest, OTPRequest } from '@/lib/types';
+import { Account, ApiResponse, LoginRequest, LoginResponse, Merchant, NotifyRequest, OTPRequest } from '@/lib/types';
 import { AuthState } from '@/features/auth/authSlice.ts';
 
 export const authApi = {
@@ -18,10 +18,25 @@ export const authApi = {
             localStorage.setItem('token', JSON.stringify(token));
 
             return token;
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.log(e);
 
             return undefined;
+        }
+    },
+    async fetchMerchantByAccountId(accountId: number): Promise<Merchant | undefined> {
+        try {
+            const {
+                data: { data: merchant },
+            } = await axios.get(`${CONFIG.services.merchants.api.url}/merchants/account/${accountId}`);
+
+            return merchant;
+        } catch (e: unknown) {
+            if (axios.isAxiosError(e)) {
+                if (e.response?.status === 404 && e.response.data) {
+                    throw new Error("Seems you aren't yet a Sidooh Merchant.");
+                }
+            }
         }
     },
     login: async (data: LoginRequest) => {
@@ -36,20 +51,18 @@ export const authApi = {
 
             if (!account) throw new Error('Invalid credentials!');
 
-            const {
-                data: { data: merchant },
-            } = await axios.get(`${CONFIG.services.merchants.api.url}/merchants/account/${account.id}`);
+            const merchant = await authApi.fetchMerchantByAccountId(account.id);
 
-            if (merchant.code !== data.store_no) throw new Error('Invalid credentials!');
+            if (merchant?.code !== data.store_no) throw new Error('Invalid credentials!');
 
             const user: AuthState['user'] = {
                 account_id: account.id,
+                business_name: merchant.business_name,
+                has_otp: data.is_refresh_token,
                 merchant_id: merchant.id,
                 name: `${merchant.first_name} ${merchant.last_name}`,
-                business_name: merchant.business_name,
                 phone: account.phone,
                 store_no: merchant.code,
-                has_otp: data.is_refresh_token,
             };
 
             localStorage.setItem('user', JSON.stringify(user));
@@ -57,7 +70,7 @@ export const authApi = {
             authApi.sendOTP(user.phone);
 
             return user;
-        } catch (err: any) {
+        } catch (err: unknown) {
             if (axios.isAxiosError(err)) {
                 if (err.response?.status && [400, 422].includes(err.response?.status) && Boolean(err.response?.data)) {
                     if (Array.isArray(err.response?.data.errors)) throw new Error(err.response?.data.errors[0].message);
@@ -72,8 +85,10 @@ export const authApi = {
                 } else {
                     throw new Error('Something went wrong!');
                 }
-            } else {
+            } else if (err instanceof Error) {
                 throw new Error(err.message);
+            } else {
+                throw new Error('Something went wrong!');
             }
         }
     },
@@ -88,13 +103,13 @@ export const authApi = {
 
         // Send OTP to user via SMS
         try {
-            await axios.post<any, any, NotifyRequest>(`${CONFIG.services.notify.api.url}/notifications`, {
+            await axios.post<never, never, NotifyRequest>(`${CONFIG.services.notify.api.url}/notifications`, {
                 channel: 'SMS',
                 content: `Your Sidooh verification code is ${otp}.\n`,
                 destination: phone,
                 // destination: 254110039317,
             });
-        } catch (e: any) {
+        } catch (e: unknown) {
             if (axios.isAxiosError(e) && e.response?.status === 401 && tries < 2) {
                 await authApi.authenticateService();
                 await authApi.sendOTP(phone, tries + 1);
@@ -121,9 +136,12 @@ export const authApi = {
             localStorage.setItem('user', JSON.stringify({ ...user, has_otp }));
 
             return has_otp;
-        } catch (err: any) {
-            console.error('Unexpected errors:', err);
-            throw new Error(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                throw new Error(err.message);
+            } else {
+                throw new Error('Something went wrong!');
+            }
         }
     },
     logout: () => {
