@@ -4,14 +4,17 @@ import { providesList } from '@/lib/utils.ts';
 
 const merchantsEndpoints = merchantsApi.injectEndpoints({
     endpoints: (build) => ({
-        buyMpesaFloat: build.mutation<any, MpesaFloatPurchaseRequest>({
+        buyMpesaFloat: build.mutation<MpesaFloatPurchaseResponse, MpesaFloatPurchaseRequest>({
             query: ({ merchant_id, ...body }) => ({
                 url: `/merchants/${merchant_id}/buy-mpesa-float`,
                 method: 'POST',
                 body,
             }),
             transformResponse: (val: ApiResponse<MpesaFloatPurchaseResponse>) => val.data,
-            invalidatesTags: [{ type: 'MpesaStore', id: 'LIST' }],
+            invalidatesTags: [
+                { type: 'MpesaStore', id: 'LIST' },
+                { type: 'Transaction', id: 'LIST' },
+            ],
         }),
         getMpesaStores: build.query<MpesaStore[], number>({
             query: (id) => `/merchants/${id}/mpesa-store-accounts`,

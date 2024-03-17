@@ -5,7 +5,7 @@ const accountsEdnpoints = accountsApi.injectEndpoints({
     endpoints: (build) => ({
         checkPin: build.mutation<boolean, PinConfirmationRequest>({
             query: ({ account_id, ...body }) => ({
-                url: `/${account_id}/check-pin`,
+                url: `/${6}/check-pin`,
                 method: 'POST',
                 body,
             }),
