@@ -7,8 +7,6 @@ import { Input } from '@/components/ui/input';
 import { login, reset } from '@/features/auth/authSlice';
 import { useAppDispatch } from '@/app/store';
 import * as yup from 'yup';
-import { Button } from '@/components/ui/button';
-import { ReloadIcon } from '@radix-ui/react-icons';
 import { AiOutlineLogin } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,6 +14,7 @@ import { useEffect } from 'react';
 import { toast } from '@/lib/utils';
 import { CONFIG } from '@/config';
 import { SAFARICOM_REGEX } from '@/constants';
+import SubmitButton from '@/components/common/SubmitButton.tsx';
 
 const formSchema = yup.object({
     phone: yup.string().matches(SAFARICOM_REGEX, { message: 'Invalid phone number' }).required('Phone is required.'),
@@ -86,21 +85,12 @@ const Login = () => {
                                 </FormItem>
                             )}
                         />
-                        <Button
-                            type={'submit'}
+                        <SubmitButton
+                            text={'Sign In'}
+                            isLoading={isLoading}
                             disabled={isLoading || !form.formState.isValid}
-                            className={'w-full bg-primary'}
-                        >
-                            {isLoading ? (
-                                <>
-                                    Authenticating... <ReloadIcon className="ms-2 h-4 w-4 animate-spin" />
-                                </>
-                            ) : (
-                                <>
-                                    Sign In <AiOutlineLogin className="ms-2 h-4 w-4" />
-                                </>
-                            )}
-                        </Button>
+                            icon={AiOutlineLogin}
+                        />
                     </form>
                 </Form>
             </CardContent>
