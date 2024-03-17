@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input.tsx';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
-import { CheckCircledIcon, CheckIcon, CrossCircledIcon, PlusIcon, ReloadIcon } from '@radix-ui/react-icons';
+import { CheckCircledIcon, CheckIcon, CrossCircledIcon, PlusIcon } from '@radix-ui/react-icons';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { MpesaFloatPurchaseRequest, MpesaStore, PinConfirmationRequest } from '@/lib/types.ts';
@@ -26,9 +26,10 @@ import {
 import { useCheckPinMutation } from '@/services/accounts/accountsEndpoints.ts';
 import { toast } from '@/lib/utils.ts';
 import { SAFARICOM_REGEX } from '@/constants';
+import SubmitButton from '@/components/common/SubmitButton.tsx';
 
 const formSchema = yup.object({
-    merchant_id: yup.number().integer().required(),
+    merchant_id: yup.number().required("Something isn't right, please refresh"),
     agent: yup.string().required('Agent number is required.'),
     store: yup.string().required('Store number is required.'),
     amount: yup.number().typeError('Must be an integer').integer().required('Amount is required.'),
@@ -109,17 +110,14 @@ const PinConfirmationForm = ({
                                     Cancel <CrossCircledIcon className="ms-2 h-4 w-4" />
                                 </Button>
                             </DialogClose>
-                            <Button type={'submit'} disabled={isLoading || !form.formState.isValid}>
-                                {isLoading ? (
-                                    <>
-                                        Confirming... <ReloadIcon className="ms-2 h-4 w-4 animate-spin" />
-                                    </>
-                                ) : (
-                                    <>
-                                        Confirm <CheckCircledIcon className="ms-2 h-4 w-4" />
-                                    </>
-                                )}
-                            </Button>
+
+                            <SubmitButton
+                                disabled={isLoading || !form.formState.isValid}
+                                isLoading={isLoading}
+                                text={'Confirm'}
+                                loadingText={'Confirming...'}
+                                icon={CheckCircledIcon}
+                            />
                         </DialogFooter>
                     </form>
                 </Form>
@@ -151,18 +149,22 @@ const FloatPurchaseForm = () => {
     }, [stores]);
 
     const completePurchaseRequest = (values: MpesaFloatPurchaseRequest) => {
+        if (openPinConfirmationForm) setOpenPinConfirmationForm(false);
+
+        values.amount = Number(values.amount);
+
         if (values.method === PaymentMethod.FLOAT) delete values['debit_account'];
 
         sendPurchaseRequest(values)
             .unwrap()
-            .then(() => toast({ titleText: 'Purchase Initiated Successfully!' }))
+            .then(() => toast({ titleText: 'Transaction Initiated Successfully!' }))
             .catch(() => toast({ titleText: 'Something went wrong. Please retry!', icon: 'error' }));
     };
 
+    console.log(isLoading);
+
     const handleSubmit: SubmitHandler<MpesaFloatPurchaseRequest> = async (values) => {
         if (values.method === PaymentMethod.FLOAT) {
-            form.setValue('amount', values.amount);
-
             setOpenPinConfirmationForm(true);
         } else {
             completePurchaseRequest(values);
@@ -178,7 +180,7 @@ const FloatPurchaseForm = () => {
                     <Card>
                         <CardHeader>
                             <CardTitle>Buy Float</CardTitle>
-                            <CardDescription>Fill in the form below to purchase float.</CardDescription>
+                            <CardDescription>Select or add store below to purchase float.</CardDescription>
                         </CardHeader>
                         <CardContent className="grid gap-6">
                             <FormField
@@ -195,8 +197,8 @@ const FloatPurchaseForm = () => {
                                                     );
 
                                                     if (store) {
-                                                        form.setValue('agent', store.store);
-                                                        form.setValue('store', store.agent);
+                                                        form.setValue('agent', store.agent);
+                                                        form.setValue('store', store.store);
                                                     }
                                                 }}
                                                 defaultValue={field.value}
@@ -338,9 +340,13 @@ const FloatPurchaseForm = () => {
                             )}
                         </CardContent>
                         <CardFooter className="justify-end space-x-2">
-                            <Button type={'submit'} disabled={isLoading || !form.formState.isValid}>
-                                Purchase
-                            </Button>
+                            <SubmitButton
+                                disabled={isLoading || !form.formState.isValid}
+                                isLoading={isLoading}
+                                text={'Initiate Transaction'}
+                                loadingText={'Initiating...'}
+                                icon={CheckCircledIcon}
+                            />
                         </CardFooter>
                     </Card>
                 </form>
