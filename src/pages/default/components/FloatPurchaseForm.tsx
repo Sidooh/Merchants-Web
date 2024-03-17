@@ -29,7 +29,7 @@ import { SAFARICOM_REGEX } from '@/constants';
 import SubmitButton from '@/components/common/SubmitButton.tsx';
 
 const formSchema = yup.object({
-    merchant_id: yup.number().required("Something isn't right, please refresh"),
+    merchant_id: yup.number().integer().required(),
     agent: yup.string().required('Agent number is required.'),
     store: yup.string().required('Store number is required.'),
     amount: yup.number().typeError('Must be an integer').integer().required('Amount is required.'),
@@ -160,8 +160,6 @@ const FloatPurchaseForm = () => {
             .then(() => toast({ titleText: 'Transaction Initiated Successfully!' }))
             .catch(() => toast({ titleText: 'Something went wrong. Please retry!', icon: 'error' }));
     };
-
-    console.log(isLoading);
 
     const handleSubmit: SubmitHandler<MpesaFloatPurchaseRequest> = async (values) => {
         if (values.method === PaymentMethod.FLOAT) {

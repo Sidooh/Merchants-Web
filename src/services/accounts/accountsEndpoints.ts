@@ -1,11 +1,11 @@
 import { ApiResponse, PinConfirmationRequest } from '@/lib/types';
 import { accountsApi } from '@/services/accounts/accountsApi.ts';
 
-const accountsEdnpoints = accountsApi.injectEndpoints({
+const accountsEndpoints = accountsApi.injectEndpoints({
     endpoints: (build) => ({
         checkPin: build.mutation<boolean, PinConfirmationRequest>({
             query: ({ account_id, ...body }) => ({
-                url: `/${6}/check-pin`,
+                url: `/${account_id}/check-pin`,
                 method: 'POST',
                 body,
             }),
@@ -14,4 +14,4 @@ const accountsEdnpoints = accountsApi.injectEndpoints({
     }),
 });
 
-export const { useCheckPinMutation } = accountsEdnpoints;
+export const { useCheckPinMutation } = accountsEndpoints;

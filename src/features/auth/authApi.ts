@@ -19,7 +19,7 @@ export const authApi = {
 
             return token;
         } catch (e: unknown) {
-            console.log(e);
+            console.error(e);
 
             return undefined;
         }
