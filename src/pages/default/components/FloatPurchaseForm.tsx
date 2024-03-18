@@ -27,6 +27,7 @@ import { useCheckPinMutation } from '@/services/accounts/accountsEndpoints.ts';
 import { toast } from '@/lib/utils.ts';
 import { SAFARICOM_REGEX } from '@/constants';
 import SubmitButton from '@/components/common/SubmitButton.tsx';
+import { useGetFloatBalanceQuery } from '@/services/payments/floatEndpoints.ts';
 
 const formSchema = yup.object({
     merchant_id: yup.number().integer().required(),
@@ -134,6 +135,8 @@ const FloatPurchaseForm = () => {
     const { data: stores, isLoading: isLoadingStores } = useGetMpesaStoresQuery(user!.merchant_id);
     const [sendPurchaseRequest, { isLoading }] = useBuyMpesaFloatMutation();
 
+    const { data: floatAccount, isLoading: isLoadingFloatAccount } = useGetFloatBalanceQuery(user!.float_account_id);
+
     const form = useForm<MpesaFloatPurchaseRequest>({
         mode: 'onBlur',
         resolver: yupResolver<MpesaFloatPurchaseRequest>(formSchema),
@@ -169,7 +172,7 @@ const FloatPurchaseForm = () => {
         }
     };
 
-    if (isLoadingStores) return <Skeleton className={'h-[25rem]'} />;
+    if (isLoadingStores || isLoadingFloatAccount) return <Skeleton className={'h-[25rem]'} />;
 
     return (
         <>
@@ -179,6 +182,9 @@ const FloatPurchaseForm = () => {
                         <CardHeader>
                             <CardTitle>Buy Float</CardTitle>
                             <CardDescription>Select or add store below to purchase float.</CardDescription>
+
+                            <span className={'text-sm mt-16'}>Voucher: {floatAccount.balance.toLocaleString()}</span>
+
                         </CardHeader>
                         <CardContent className="grid gap-6">
                             <FormField
