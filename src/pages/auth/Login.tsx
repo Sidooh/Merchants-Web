@@ -86,6 +86,7 @@ const Login = () => {
                             )}
                         />
                         <SubmitButton
+                            className={'w-full'}
                             text={'Sign In'}
                             isLoading={isLoading}
                             disabled={isLoading || !form.formState.isValid}

@@ -15,7 +15,7 @@ interface SubmitButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(
     ({ text, loadingText = 'Loading...', isLoading, disabled, icon: Icon, className }, ref) => (
-        <Button ref={ref} type={'submit'} disabled={disabled} className={cn('bg-primary', { className })}>
+        <Button ref={ref} type={'submit'} disabled={disabled} className={cn('bg-primary', className)}>
             {isLoading ? (
                 <>
                     {loadingText} <ReloadIcon className="ms-2 h-4 w-4 animate-spin" />
