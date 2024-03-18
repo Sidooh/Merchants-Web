@@ -63,6 +63,7 @@ export const authApi = {
                 name: `${merchant.first_name} ${merchant.last_name}`,
                 phone: account.phone,
                 store_no: merchant.code,
+                float_account_id: merchant.float_account_id,
             };
 
             localStorage.setItem('user', JSON.stringify(user));
