@@ -257,7 +257,7 @@ const FloatPurchaseForm = () => {
                                             </Select>
                                             {field.value === PaymentMethod.FLOAT && (
                                                 <FormDescription>
-                                                    Voucher Balance: <b>{floatAccount?.balance.toLocaleString()}</b>
+                                                    Balance: <b>{floatAccount?.balance.toLocaleString()}</b>
                                                 </FormDescription>
                                             )}
                                             <FormMessage />
