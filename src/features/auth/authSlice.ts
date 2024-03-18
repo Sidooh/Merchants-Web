@@ -16,6 +16,7 @@ export type AuthState = {
         name: string;
         phone: number;
         store_no: string;
+        float_account_id: number;
     };
 };
 

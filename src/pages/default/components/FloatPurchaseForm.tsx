@@ -27,13 +27,13 @@ import { useCheckPinMutation } from '@/services/accounts/accountsEndpoints.ts';
 import { toast } from '@/lib/utils.ts';
 import { SAFARICOM_REGEX } from '@/constants';
 import SubmitButton from '@/components/common/SubmitButton.tsx';
-import { useGetFloatBalanceQuery } from '@/services/payments/floatEndpoints.ts';
+import { useGetFloatAccountQuery } from '@/services/payments/floatEndpoints.ts';
 
 const formSchema = yup.object({
     merchant_id: yup.number().integer().required(),
     agent: yup.string().required('Agent number is required.'),
     store: yup.string().required('Store number is required.'),
-    amount: yup.number().typeError('Must be an integer').integer().required('Amount is required.'),
+    amount: yup.number().typeError('Please enter amount').required('Amount is required.'),
     method: yup
         .string()
         .oneOf(Object.values(PaymentMethod), 'Method must be MPESA or VOUCHER')
@@ -49,7 +49,7 @@ const formSchema = yup.object({
 
 const pinConfirmationSchema = yup.object({
     account_id: yup.number().integer().required(),
-    pin: yup.string().length(4, `Pin must be ${length} digits`).required('Pin number is required.'),
+    pin: yup.string().length(4, `Must be 4 digits`).required('Pin number is required.'),
 });
 
 const PinConfirmationForm = ({
@@ -73,7 +73,11 @@ const PinConfirmationForm = ({
 
     const handleSubmit: SubmitHandler<PinConfirmationRequest> = async (values) => {
         try {
-            if (await checkPin(values).unwrap()) onConfirmed();
+            if (await checkPin(values).unwrap()) {
+                onConfirmed();
+
+                form.resetField('pin');
+            }
         } catch (e) {
             toast({ titleText: 'Invalid Pin!', icon: 'warning', position: 'top' });
 
@@ -81,8 +85,14 @@ const PinConfirmationForm = ({
         }
     };
 
+    const handleOpenChange = (open: boolean) => {
+        if (!open) form.resetField('pin');
+
+        setOpen(open);
+    };
+
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)} className="sm:max-w-md space-y-4">
@@ -133,9 +143,8 @@ const FloatPurchaseForm = () => {
 
     const { user } = useAuth();
     const { data: stores, isLoading: isLoadingStores } = useGetMpesaStoresQuery(user!.merchant_id);
+    const { data: floatAccount, isLoading: isLoadingFloatAccount } = useGetFloatAccountQuery(user!.float_account_id);
     const [sendPurchaseRequest, { isLoading }] = useBuyMpesaFloatMutation();
-
-    const { data: floatAccount, isLoading: isLoadingFloatAccount } = useGetFloatBalanceQuery(user!.float_account_id);
 
     const form = useForm<MpesaFloatPurchaseRequest>({
         mode: 'onBlur',
@@ -143,6 +152,7 @@ const FloatPurchaseForm = () => {
         defaultValues: {
             merchant_id: user?.merchant_id,
             method: PaymentMethod.FLOAT,
+            store: '',
             debit_account: String(user?.phone),
         },
     });
@@ -160,7 +170,11 @@ const FloatPurchaseForm = () => {
 
         sendPurchaseRequest(values)
             .unwrap()
-            .then(() => toast({ titleText: 'Transaction Initiated Successfully!' }))
+            .then(() => {
+                toast({ titleText: 'Transaction Initiated Successfully!' });
+
+                form.reset();
+            })
             .catch(() => toast({ titleText: 'Something went wrong. Please retry!', icon: 'error' }));
     };
 
@@ -182,9 +196,6 @@ const FloatPurchaseForm = () => {
                         <CardHeader>
                             <CardTitle>Buy Float</CardTitle>
                             <CardDescription>Select or add store below to purchase float.</CardDescription>
-
-                            <span className={'text-sm mt-16'}>Voucher: {floatAccount.balance.toLocaleString()}</span>
-
                         </CardHeader>
                         <CardContent className="grid gap-6">
                             <FormField
@@ -206,6 +217,7 @@ const FloatPurchaseForm = () => {
                                                     }
                                                 }}
                                                 defaultValue={field.value}
+                                                value={field.value}
                                                 disabled={isAddingStore}
                                             >
                                                 <FormControl className={'col-span-2'}>
@@ -302,7 +314,11 @@ const FloatPurchaseForm = () => {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Buy using</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={field.value}
+                                                value={field.value}
+                                            >
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Select a payment method" />
@@ -310,7 +326,8 @@ const FloatPurchaseForm = () => {
                                                 </FormControl>
                                                 <SelectContent>
                                                     <SelectItem value={PaymentMethod.FLOAT}>
-                                                        {PaymentMethod.VOUCHER}
+                                                        {PaymentMethod.VOUCHER} (
+                                                        <b>{floatAccount?.balance.toLocaleString()})</b>
                                                     </SelectItem>
                                                     <SelectItem value={PaymentMethod.MPESA}>
                                                         {PaymentMethod.MPESA}

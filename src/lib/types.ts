@@ -56,8 +56,6 @@ export type MpesaStore = Model & {
 };
 
 export type FloatAccount = Model & {
-    id: number;
-
     balance: number;
 };
 
