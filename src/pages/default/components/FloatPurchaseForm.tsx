@@ -159,7 +159,11 @@ const FloatPurchaseForm = () => {
                                                 variant={'outline'}
                                                 aria-label="Toggle italic"
                                                 className={'text-nowrap'}
-                                                onPressedChange={setIsAddingStore}
+                                                onPressedChange={(pressed) => {
+                                                    setIsAddingStore(pressed);
+
+                                                    if (pressed) setSelectedStore(undefined);
+                                                }}
                                             >
                                                 {isAddingStore ? (
                                                     <CheckIcon className="mr-2 h-4 w-4" />
