@@ -3,12 +3,12 @@ import { paymentsApi } from '@/services/payments/paymentsApi.ts';
 
 const floatEndpoints = paymentsApi.injectEndpoints({
     endpoints: (build) => ({
-        getFloatBalance: build.query<FloatAccount, number>({
+        getFloatAccount: build.query<FloatAccount, number>({
             query: (id) => `/float-accounts/${id}`,
             transformResponse: (val: ApiResponse<FloatAccount>) => val.data,
-            // providesTags: (result) => providesList(result, 'FloatAccount'),
+            providesTags: (_, __, id) => [{ type: 'FloatAccount', id }],
         }),
     }),
 });
 
-export const { useGetFloatBalanceQuery } = floatEndpoints;
+export const { useGetFloatAccountQuery } = floatEndpoints;
