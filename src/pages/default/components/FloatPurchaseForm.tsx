@@ -162,7 +162,12 @@ const FloatPurchaseForm = () => {
                                                 onPressedChange={(pressed) => {
                                                     setIsAddingStore(pressed);
 
-                                                    if (pressed) setSelectedStore(undefined);
+                                                    if (pressed) {
+                                                        setSelectedStore(undefined);
+
+                                                        form.resetField('store');
+                                                        form.resetField('agent');
+                                                    }
                                                 }}
                                             >
                                                 {isAddingStore ? (
