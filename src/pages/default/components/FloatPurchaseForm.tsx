@@ -117,7 +117,7 @@ const FloatPurchaseForm = () => {
                             <CardTitle>Buy Float</CardTitle>
                             <CardDescription>Select or add store below to purchase float.</CardDescription>
                         </CardHeader>
-                        <CardContent className="grid gap-6">
+                        <CardContent className="grid gap-3">
                             <FormField
                                 name="store"
                                 control={form.control}
@@ -175,7 +175,7 @@ const FloatPurchaseForm = () => {
                                                 ) : (
                                                     <PlusIcon className="mr-2 h-4 w-4" />
                                                 )}
-                                                {isAddingStore ? 'Select store' : 'Add store'}
+                                                {isAddingStore ? 'Select' : 'Add'}
                                             </Toggle>
                                         </div>
                                         <FormMessage />
@@ -221,7 +221,7 @@ const FloatPurchaseForm = () => {
                                 </div>
                             )}
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid lg:grid-cols-2 gap-3">
                                 <FormField
                                     control={form.control}
                                     name="amount"
@@ -244,7 +244,7 @@ const FloatPurchaseForm = () => {
                                     name="method"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Buy using</FormLabel>
+                                            <FormLabel>Buy Using</FormLabel>
                                             <Select
                                                 onValueChange={field.onChange}
                                                 defaultValue={field.value}
@@ -266,7 +266,8 @@ const FloatPurchaseForm = () => {
                                             </Select>
                                             {field.value === PaymentMethod.FLOAT && (
                                                 <FormDescription>
-                                                    Balance: <b>{floatAccount?.balance.toLocaleString()}</b>
+                                                    Your Voucher Balance:{' '}
+                                                    <b>{floatAccount?.balance.toLocaleString()}</b>
                                                 </FormDescription>
                                             )}
                                             <FormMessage />
