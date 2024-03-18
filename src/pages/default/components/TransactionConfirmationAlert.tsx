@@ -28,53 +28,51 @@ const TransactionConfirmationAlert = ({
     open,
     setOpen,
     onConfirmed,
-}: TransactionConfirmationAlertProps) => {
-    return (
-        <AlertDialog open={open} onOpenChange={setOpen}>
-            <AlertDialogContent className={'max-w-xs'}>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>CONFIRM</AlertDialogTitle>
-                    {store && (
-                        <>
-                            <div className="space-y-1">
-                                <h4 className="text-xs text-muted-foreground font-medium leading-none">Purchase For</h4>
-                                <p className="text-sm ">{store.name.split('-')[1]}</p>
-                            </div>
-                            <Separator className="my-4" />
-                        </>
-                    )}
-                    <div className="space-y-1">
-                        <h4 className="text-xs text-muted-foreground font-medium leading-none">Store Number</h4>
-                        <p className="text-sm ">{values.store}</p>
-                    </div>
-                    <Separator className="my-4" />
-                    <div className="space-y-1">
-                        <h4 className="text-xs text-muted-foreground font-medium leading-none">Agent Number</h4>
-                        <p className="text-sm ">{values.agent}</p>
-                    </div>
-                    <Separator className="my-4" />
-                    <div className="space-y-1">
-                        <h4 className="text-xs text-muted-foreground font-medium leading-none">Payment Method</h4>
-                        <p className="text-sm ">
-                            {values.method === PaymentMethod.FLOAT ? 'VOUCHER' : `MPESA - ${values.debit_account}`}
-                        </p>
-                    </div>
-                    <Separator className="my-4" />
-                    <div className="space-y-1">
-                        <h4 className="text-xs text-muted-foreground font-medium leading-none">Amount</h4>
-                        <p className="text-sm ">{currencyFormat(values.amount)}</p>
-                    </div>
-                    <Separator className="my-4" />
-                </AlertDialogHeader>
-                <AlertDialogFooter className={''}>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={onConfirmed}>
-                        Continue <ArrowRightIcon className={'ms-1'} />
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-    );
-};
+}: TransactionConfirmationAlertProps) => (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent className={'max-w-xs'}>
+            <AlertDialogHeader className={'text-start'}>
+                <AlertDialogTitle>CONFIRM</AlertDialogTitle>
+                {store && (
+                    <>
+                        <div className="space-y-1">
+                            <h4 className="text-xs text-muted-foreground font-medium leading-none">Purchase For</h4>
+                            <p className="text-sm ">{store.name.split('-')[1]}</p>
+                        </div>
+                        <Separator className="my-4" />
+                    </>
+                )}
+                <div className="space-y-1">
+                    <h4 className="text-xs text-muted-foreground font-medium leading-none">Store Number</h4>
+                    <p className="text-sm ">{values.store}</p>
+                </div>
+                <Separator className="my-4" />
+                <div className="space-y-1">
+                    <h4 className="text-xs text-muted-foreground font-medium leading-none">Agent Number</h4>
+                    <p className="text-sm ">{values.agent}</p>
+                </div>
+                <Separator className="my-4" />
+                <div className="space-y-1">
+                    <h4 className="text-xs text-muted-foreground font-medium leading-none">Payment Method</h4>
+                    <p className="text-sm ">
+                        {values.method === PaymentMethod.FLOAT ? 'VOUCHER' : `MPESA - ${values.debit_account}`}
+                    </p>
+                </div>
+                <Separator className="my-4" />
+                <div className="space-y-1">
+                    <h4 className="text-xs text-muted-foreground font-medium leading-none">Amount</h4>
+                    <p className="text-sm ">{currencyFormat(values.amount)}</p>
+                </div>
+                <Separator className="my-4" />
+            </AlertDialogHeader>
+            <AlertDialogFooter className={''}>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={onConfirmed}>
+                    Continue <ArrowRightIcon className={'ms-1'} />
+                </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+);
 
 export default TransactionConfirmationAlert;
