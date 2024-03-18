@@ -1,0 +1,64 @@
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog.tsx';
+import { MpesaFloatPurchaseRequest } from '@/lib/types.ts';
+import { ArrowRightIcon } from '@radix-ui/react-icons';
+import { Separator } from '@/components/ui/separator.tsx';
+import { PaymentMethod } from '@/lib/enums.ts';
+import { currencyFormat } from '@/lib/utils.ts';
+import { Dispatch, SetStateAction } from 'react';
+
+type TransactionConfirmationAlertProps = {
+    values: MpesaFloatPurchaseRequest;
+    open: boolean;
+    setOpen: Dispatch<SetStateAction<boolean>>;
+    onConfirmed: () => void;
+};
+
+const TransactionConfirmationAlert = ({ values, open, setOpen, onConfirmed }: TransactionConfirmationAlertProps) => {
+    return (
+        <AlertDialog open={open} onOpenChange={setOpen}>
+            <AlertDialogContent className={'max-w-xs'}>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>CONFIRM</AlertDialogTitle>
+                    <div className="space-y-1">
+                        <h4 className="text-xs text-muted-foreground font-medium leading-none">Agent Number</h4>
+                        <p className="text-sm ">{values.agent}</p>
+                    </div>
+                    <Separator className="my-4" />
+                    <div className="space-y-1">
+                        <h4 className="text-xs text-muted-foreground font-medium leading-none">Store Number</h4>
+                        <p className="text-sm ">{values.store}</p>
+                    </div>
+                    <Separator className="my-4" />
+                    <div className="space-y-1">
+                        <h4 className="text-xs text-muted-foreground font-medium leading-none">Payment Method</h4>
+                        <p className="text-sm ">
+                            {values.method === PaymentMethod.FLOAT ? 'VOUCHER' : `MPESA - ${values.debit_account}`}
+                        </p>
+                    </div>
+                    <Separator className="my-4" />
+                    <div className="space-y-1">
+                        <h4 className="text-xs text-muted-foreground font-medium leading-none">Amount</h4>
+                        <p className="text-sm ">{currencyFormat(values.amount)}</p>
+                    </div>
+                    <Separator className="my-4" />
+                </AlertDialogHeader>
+                <AlertDialogFooter className={''}>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={onConfirmed}>
+                        Continue <ArrowRightIcon className={'ms-1'} />
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    );
+};
+
+export default TransactionConfirmationAlert;
