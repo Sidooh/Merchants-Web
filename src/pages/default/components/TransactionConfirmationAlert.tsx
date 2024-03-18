@@ -7,7 +7,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog.tsx';
-import { MpesaFloatPurchaseRequest } from '@/lib/types.ts';
+import { MpesaFloatPurchaseRequest, MpesaStore } from '@/lib/types.ts';
 import { ArrowRightIcon } from '@radix-ui/react-icons';
 import { Separator } from '@/components/ui/separator.tsx';
 import { PaymentMethod } from '@/lib/enums.ts';
@@ -17,24 +17,40 @@ import { Dispatch, SetStateAction } from 'react';
 type TransactionConfirmationAlertProps = {
     values: MpesaFloatPurchaseRequest;
     open: boolean;
+    store?: MpesaStore;
     setOpen: Dispatch<SetStateAction<boolean>>;
     onConfirmed: () => void;
 };
 
-const TransactionConfirmationAlert = ({ values, open, setOpen, onConfirmed }: TransactionConfirmationAlertProps) => {
+const TransactionConfirmationAlert = ({
+    values,
+    store,
+    open,
+    setOpen,
+    onConfirmed,
+}: TransactionConfirmationAlertProps) => {
     return (
         <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogContent className={'max-w-xs'}>
                 <AlertDialogHeader>
                     <AlertDialogTitle>CONFIRM</AlertDialogTitle>
-                    <div className="space-y-1">
-                        <h4 className="text-xs text-muted-foreground font-medium leading-none">Agent Number</h4>
-                        <p className="text-sm ">{values.agent}</p>
-                    </div>
-                    <Separator className="my-4" />
+                    {store && (
+                        <>
+                            <div className="space-y-1">
+                                <h4 className="text-xs text-muted-foreground font-medium leading-none">Purchase For</h4>
+                                <p className="text-sm ">{store.name.split('-')[1]}</p>
+                            </div>
+                            <Separator className="my-4" />
+                        </>
+                    )}
                     <div className="space-y-1">
                         <h4 className="text-xs text-muted-foreground font-medium leading-none">Store Number</h4>
                         <p className="text-sm ">{values.store}</p>
+                    </div>
+                    <Separator className="my-4" />
+                    <div className="space-y-1">
+                        <h4 className="text-xs text-muted-foreground font-medium leading-none">Agent Number</h4>
+                        <p className="text-sm ">{values.agent}</p>
                     </div>
                     <Separator className="my-4" />
                     <div className="space-y-1">

@@ -1,6 +1,8 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { ReactNode } from 'react';
+import { logout } from '@/features/auth/authSlice.ts';
+import { useAppDispatch } from '@/app/store.ts';
 
 export const Middleware = {
     Guest: ({ component }: { component: ReactNode }) => {
@@ -21,9 +23,12 @@ export const Middleware = {
     Auth: ({ component }: { component: ReactNode }) => {
         const { user } = useAuth();
         const location = useLocation();
+        const dispatch = useAppDispatch();
 
         if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
         if (!user.has_otp) return <Navigate to="/otp" state={{ from: location }} replace />;
+
+        if (!user.float_account_id) dispatch(logout());
 
         return component;
     },
