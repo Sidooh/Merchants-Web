@@ -15,7 +15,7 @@ export const toast = async (options: SweetAlertOptions = {}) => {
     const defaultOptions: SweetAlertOptions = {
         icon: 'success',
         toast: true,
-        position: 'bottom-right',
+        position: 'top-right',
         showConfirmButton: false,
         timer: 7000,
         ...options,
