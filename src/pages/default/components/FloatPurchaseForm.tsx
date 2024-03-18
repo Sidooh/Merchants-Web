@@ -1,7 +1,15 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form.tsx';
 import { CheckCircledIcon, CheckIcon, PlusIcon } from '@radix-ui/react-icons';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -39,6 +47,7 @@ const formSchema = yup.object({
 });
 
 const FloatPurchaseForm = () => {
+    const [selectedStore, setSelectedStore] = useState<MpesaStore>();
     const [isAddingStore, setIsAddingStore] = useState(false);
     const [openPinConfirmationForm, setOpenPinConfirmationForm] = useState(false);
     const [openTransactionConfirmationAlert, setOpenTransactionConfirmationAlert] = useState(false);
@@ -80,7 +89,10 @@ const FloatPurchaseForm = () => {
             .catch(() => toast({ titleText: 'Something went wrong. Please retry!', icon: 'error' }));
     };
 
-    const handleSubmit: SubmitHandler<MpesaFloatPurchaseRequest> = async () => {
+    const handleSubmit: SubmitHandler<MpesaFloatPurchaseRequest> = async (values) => {
+        if (values.method === PaymentMethod.FLOAT && values.amount > (floatAccount?.balance || 0))
+            return toast({ titleText: 'Insufficient voucher balance.', icon: 'warning' });
+
         setOpenTransactionConfirmationAlert(true);
     };
 
@@ -120,6 +132,8 @@ const FloatPurchaseForm = () => {
                                                     );
 
                                                     if (store) {
+                                                        setSelectedStore(store);
+
                                                         form.setValue('agent', store.agent);
                                                         form.setValue('store', store.store);
                                                     }
@@ -234,14 +248,18 @@ const FloatPurchaseForm = () => {
                                                 </FormControl>
                                                 <SelectContent>
                                                     <SelectItem value={PaymentMethod.FLOAT}>
-                                                        {PaymentMethod.VOUCHER} (
-                                                        <b>{floatAccount?.balance.toLocaleString()})</b>
+                                                        {PaymentMethod.VOUCHER}
                                                     </SelectItem>
                                                     <SelectItem value={PaymentMethod.MPESA}>
                                                         {PaymentMethod.MPESA}
                                                     </SelectItem>
                                                 </SelectContent>
                                             </Select>
+                                            {field.value === PaymentMethod.FLOAT && (
+                                                <FormDescription>
+                                                    Voucher Balance: <b>{floatAccount?.balance.toLocaleString()}</b>
+                                                </FormDescription>
+                                            )}
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -290,6 +308,7 @@ const FloatPurchaseForm = () => {
             <TransactionConfirmationAlert
                 open={openTransactionConfirmationAlert}
                 values={form.getValues()}
+                store={selectedStore}
                 setOpen={setOpenTransactionConfirmationAlert}
                 onConfirmed={handleTransactionConfirmed}
             />
