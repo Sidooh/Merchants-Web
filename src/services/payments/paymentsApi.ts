@@ -1,10 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { CONFIG } from '@/config';
-import { getAuthToken } from '@/lib/utils.ts';
+import { getAuthToken, providesList } from '@/lib/utils.ts';
+import { ApiResponse, Charge } from '@/lib/types.ts';
 
 export const paymentsApi = createApi({
     reducerPath: 'paymentsApi',
-    tagTypes: ['FloatAccount'],
+    tagTypes: ['FloatAccount', 'Charge'],
     keepUnusedDataFor: 60 * 7, //  Seven Minutes
     baseQuery: fetchBaseQuery({
         baseUrl: CONFIG.services.payments.api.url,
@@ -16,5 +17,17 @@ export const paymentsApi = createApi({
             return headers;
         },
     }),
-    endpoints: () => ({}),
+    endpoints: (build) => ({
+        getFloatCharges: build.query<Charge[], void>({
+            query: () => '/charges/mpesa-float',
+            transformResponse: (val: ApiResponse<Charge[]>) => val.data,
+            providesTags: (result) =>
+                providesList(
+                    result?.map((r, i) => ({ ...r, id: i })),
+                    'Charge'
+                ),
+        }),
+    }),
 });
+
+export const { useGetFloatChargesQuery } = paymentsApi;

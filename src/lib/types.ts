@@ -118,3 +118,5 @@ export type NotifyRequest = {
     event_type?: string;
     content: string;
 };
+
+export type Charge = { min: number; max: number; charge: number };
