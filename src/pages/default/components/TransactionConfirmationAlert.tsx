@@ -67,13 +67,15 @@ const TransactionConfirmationAlert = ({
                     <Separator className="my-4" />
                     <div className="space-y-1">
                         <h4 className="text-xs text-muted-foreground font-medium leading-none">Amount</h4>
-                        <p className="text-sm ">{currencyFormat(values.amount)}</p>
 
-                        <div className="text-[7pt] text-muted-foreground">
+                        <div>
+                            <p className="text-sm ">{currencyFormat(values.amount)}</p>
                             {isLoading ? (
                                 <div className={'h-3 w-1/3 bg-slate-200 rounded'} />
                             ) : (
-                                <>FEE {currencyFormat(charge?.charge)}</>
+                                <p className={'text-[7pt] text-muted-foreground font-medium'}>
+                                    FEE {currencyFormat(charge?.charge)}
+                                </p>
                             )}
                         </div>
                     </div>
