@@ -4,7 +4,7 @@ import { useCheckPinMutation } from '@/services/accounts/accountsEndpoints.ts';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { PinConfirmationRequest } from '@/lib/types.ts';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { toast } from '@/lib/utils.ts';
+import { cn, toast } from '@/lib/utils.ts';
 import {
     Dialog,
     DialogClose,
@@ -14,7 +14,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog.tsx';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { CheckCircledIcon, CrossCircledIcon } from '@radix-ui/react-icons';
@@ -22,9 +22,10 @@ import SubmitButton from '@/components/common/SubmitButton.tsx';
 import * as yup from 'yup';
 
 type PinConfirmationFormProps = {
-    open: boolean;
-    setOpen: Dispatch<SetStateAction<boolean>>;
+    canCancel?: boolean;
     onConfirmed: () => void;
+    open: boolean;
+    setOpen?: Dispatch<SetStateAction<boolean>>;
 };
 
 const pinConfirmationSchema = yup.object({
@@ -32,7 +33,7 @@ const pinConfirmationSchema = yup.object({
     pin: yup.string().length(4, `Must be 4 digits`).required('Pin number is required.'),
 });
 
-const PinConfirmationForm = ({ open, setOpen, onConfirmed }: PinConfirmationFormProps) => {
+const PinConfirmationForm = ({ open, setOpen, canCancel, onConfirmed }: PinConfirmationFormProps) => {
     const { user } = useAuth();
     const [checkPin, { isLoading }] = useCheckPinMutation();
 
@@ -60,7 +61,7 @@ const PinConfirmationForm = ({ open, setOpen, onConfirmed }: PinConfirmationForm
     const handleOpenChange = (open: boolean) => {
         if (!open) form.resetField('pin');
 
-        setOpen(open);
+        if (setOpen) setOpen(open);
     };
 
     return (
@@ -69,17 +70,14 @@ const PinConfirmationForm = ({ open, setOpen, onConfirmed }: PinConfirmationForm
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)} className="sm:max-w-md space-y-4">
                         <DialogHeader>
-                            <DialogTitle>Pin Confirmation</DialogTitle>
-                            <DialogDescription>
-                                Please confirm your Sidooh Pin to complete the purchase.
-                            </DialogDescription>
+                            <DialogTitle>PIN Confirmation</DialogTitle>
+                            <DialogDescription>Please confirm your Sidooh PIN to continue.</DialogDescription>
                         </DialogHeader>
                         <FormField
                             control={form.control}
                             name="pin"
                             render={() => (
                                 <FormItem>
-                                    <FormLabel>Pin</FormLabel>
                                     <FormControl>
                                         <Input placeholder="****" type={'password'} {...form.register('pin')} />
                                     </FormControl>
@@ -87,12 +85,14 @@ const PinConfirmationForm = ({ open, setOpen, onConfirmed }: PinConfirmationForm
                                 </FormItem>
                             )}
                         />
-                        <DialogFooter className="sm:justify-between gap-y-3">
-                            <DialogClose asChild>
-                                <Button type="button" variant="ghost" className={'text-red-700'}>
-                                    Cancel <CrossCircledIcon className="ms-2 h-4 w-4" />
-                                </Button>
-                            </DialogClose>
+                        <DialogFooter className={cn('gap-y-3', { 'sm:justify-between ': canCancel })}>
+                            {canCancel && (
+                                <DialogClose asChild>
+                                    <Button type="button" variant="ghost" className={'text-red-700'}>
+                                        Cancel <CrossCircledIcon className="ms-2 h-4 w-4" />
+                                    </Button>
+                                </DialogClose>
+                            )}
 
                             <SubmitButton
                                 disabled={isLoading || !form.formState.isValid}
