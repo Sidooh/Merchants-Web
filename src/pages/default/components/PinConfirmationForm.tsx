@@ -1,10 +1,10 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth.ts';
 import { useCheckPinMutation } from '@/services/accounts/accountsEndpoints.ts';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { PinConfirmationRequest } from '@/lib/types.ts';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { cn, toast } from '@/lib/utils.ts';
+import { cn } from '@/lib/utils.ts';
 import {
     Dialog,
     DialogClose,
@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button.tsx';
 import { CheckCircledIcon, CrossCircledIcon } from '@radix-ui/react-icons';
 import SubmitButton from '@/components/common/SubmitButton.tsx';
 import * as yup from 'yup';
+import AlertError from '@/components/errors/AlertError.tsx';
 
 type PinConfirmationFormProps = {
     canCancel?: boolean;
@@ -35,6 +36,7 @@ const pinConfirmationSchema = yup.object({
 
 const PinConfirmationForm = ({ open, setOpen, canCancel, onConfirmed }: PinConfirmationFormProps) => {
     const { user } = useAuth();
+    const [error, setError] = useState<string>();
     const [checkPin, { isLoading }] = useCheckPinMutation();
 
     const form = useForm<PinConfirmationRequest>({
@@ -52,7 +54,7 @@ const PinConfirmationForm = ({ open, setOpen, canCancel, onConfirmed }: PinConfi
                 form.resetField('pin');
             }
         } catch (e) {
-            toast({ titleText: 'Invalid Pin!', icon: 'warning', position: 'top' });
+            setError('Invalid Pin!');
 
             form.resetField('pin');
         }
@@ -72,6 +74,7 @@ const PinConfirmationForm = ({ open, setOpen, canCancel, onConfirmed }: PinConfi
                         <DialogHeader>
                             <DialogTitle>PIN Confirmation</DialogTitle>
                             <DialogDescription>Please confirm your Sidooh PIN to continue.</DialogDescription>
+                            <AlertError error={error} className={'mt-4'} />
                         </DialogHeader>
                         <FormField
                             control={form.control}

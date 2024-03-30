@@ -6,6 +6,7 @@ import { IconType } from 'react-icons';
 import { FaCalendarXmark, FaCheck, FaCircleExclamation, FaCircleInfo, FaHourglassStart } from 'react-icons/fa6';
 import moment from 'moment';
 import { authApi } from '@/features/auth/authApi.ts';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -130,4 +131,18 @@ export function providesList<R extends { id: string | number }[], T extends stri
     return resultsWithIds
         ? [{ type: tagType, id: 'LIST' }, ...resultsWithIds.map(({ id }) => ({ type: tagType, id }))]
         : [{ type: tagType, id: 'LIST' }];
+}
+
+/**
+ * Type predicate to narrow an unknown error to `FetchBaseQueryError`
+ */
+export function isFetchBaseQueryError(error: unknown): error is FetchBaseQueryError {
+    return typeof error === 'object' && error != null && 'status' in error;
+}
+
+/**
+ * Type predicate to narrow an unknown error to an object with a string 'message' property
+ */
+export function isErrorWithMessage(error: unknown): error is { message: string } {
+    return typeof error === 'object' && error != null && 'message' in error && typeof error.message === 'string';
 }
