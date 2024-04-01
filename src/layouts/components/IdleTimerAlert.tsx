@@ -13,7 +13,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog.tsx';
 
-const timeout = 120_000;
+const timeout = 10_000;
 const promptBeforeIdle = Math.ceil(timeout / 3);
 
 const IdleTimerAlert = () => {
