@@ -145,8 +145,4 @@ export const authApi = {
             }
         }
     },
-    logout: () => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-    },
 };

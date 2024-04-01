@@ -8,7 +8,6 @@ import { login, reset } from '@/features/auth/authSlice';
 import { useAppDispatch } from '@/app/store';
 import * as yup from 'yup';
 import { AiOutlineLogin } from 'react-icons/ai';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect } from 'react';
 import { toast } from '@/lib/utils';
@@ -23,7 +22,6 @@ const formSchema = yup.object({
 
 const Login = () => {
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
     const { user, isError, isSuccess, isLoading, message } = useAuth();
     const form = useForm<LoginRequest>({
         mode: 'onBlur',
@@ -40,7 +38,7 @@ const Login = () => {
         if (isError) toast({ titleText: message, icon: 'error' });
 
         dispatch(reset());
-    }, [user, isError, isSuccess, message, navigate, dispatch]);
+    }, [user, isError, isSuccess, message, dispatch]);
 
     return (
         <Card className={'p-5 h-full lg:max-w-3xl lg:min-w-[30rem] relative shadow-xl border-0'}>
