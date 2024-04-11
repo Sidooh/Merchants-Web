@@ -15,6 +15,7 @@ import { ModeToggle } from '@/components/ModeToggle.tsx';
 import { useAuth } from '@/hooks/useAuth.ts';
 import { logout, reset } from '@/features/auth/authSlice';
 import { useAppDispatch } from '@/app/store.ts';
+import MobileNav from '@/layouts/components/MobileNav.tsx';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -47,14 +48,16 @@ const Header = () => {
 
     return (
         <header
-            className={cn('sticky top-0 z-40 bg-background', {
+            className={cn('sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60', {
                 'shadow-[0_.5rem_.5rem_-.5rem_#0003]': showDropShadow,
             })}
         >
-            <div className="container flex h-16 items-center justify-between py-4">
-                <div className="flex gap-6 md:gap-10">
+            <div className="container flex h-14 items-center justify-between px-3 md:px-8 py-4">
+                <div className="flex md:gap-10">
+                    <MobileNav/>
+
                     <Link to="/">
-                        <Logo />
+                        <Logo className={'w-20'} />
                     </Link>
                 </div>
 

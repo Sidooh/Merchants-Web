@@ -21,14 +21,14 @@ const AlertError = forwardRef<HTMLDivElement, ServerErrorProps>(({ error, classN
                     }
                 }
                 if (error.status === 'FETCH_ERROR') {
-                    setMessage('...Nikama server iko down😞 please try again later.');
+                    setMessage('Our servers seem to be down😞 please try again later.');
                 }
             } else if (typeof error === 'string') {
                 setMessage(error);
             } else if (isErrorWithMessage(error)) {
                 setMessage(error.message);
             } else {
-                setMessage('...na sina fom shida ni gani lakini jaribu tu tena.🤡');
+                setMessage('Something went wrong! Kindly contact admin ASAP!');
             }
         }
     }, [error]);

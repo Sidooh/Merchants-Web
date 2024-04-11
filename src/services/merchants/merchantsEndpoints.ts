@@ -1,4 +1,10 @@
-import { ApiResponse, MpesaFloatPurchaseRequest, MpesaFloatPurchaseResponse, MpesaStore } from '@/lib/types.ts';
+import {
+    ApiResponse,
+    MpesaFloatPurchaseRequest,
+    MpesaFloatPurchaseResponse,
+    MpesaStore, VoucherPurchaseRequest,
+    VoucherPurchaseResponse,
+} from '@/lib/types.ts';
 import { merchantsApi } from '@/services/merchants/merchantsApi.ts';
 import { providesList } from '@/lib/utils.ts';
 
@@ -16,6 +22,15 @@ const merchantsEndpoints = merchantsApi.injectEndpoints({
                 { type: 'Transaction', id: 'LIST' },
             ],
         }),
+        topUpFloat: build.mutation<VoucherPurchaseResponse, VoucherPurchaseRequest>({
+            query: ({ merchant_id, ...body }) => ({
+                url: `/merchants/${merchant_id}/float-top-up`,
+                method: 'POST',
+                body,
+            }),
+            transformResponse: (val: ApiResponse<MpesaFloatPurchaseResponse>) => val.data,
+            invalidatesTags: [{ type: 'Transaction', id: 'LIST' }],
+        }),
         getMpesaStores: build.query<MpesaStore[], number>({
             query: (id) => `/merchants/${id}/mpesa-store-accounts`,
             transformResponse: (val: ApiResponse<MpesaStore[]>) => val.data,
@@ -24,4 +39,4 @@ const merchantsEndpoints = merchantsApi.injectEndpoints({
     }),
 });
 
-export const { useGetMpesaStoresQuery, useBuyMpesaFloatMutation } = merchantsEndpoints;
+export const { useGetMpesaStoresQuery, useBuyMpesaFloatMutation, useTopUpFloatMutation } = merchantsEndpoints;
