@@ -38,7 +38,7 @@ const AlertError = forwardRef<HTMLDivElement, ServerErrorProps>(({ error, classN
     return (
         <Alert ref={ref} className={cn('text-red-600 text-start border-dashed border-red-600 p-3 mb-2', { className })}>
             <AlertTitle className={'flex items-center gap-1'}>
-                <MdError /> Makosa ilifanyika! 🌚
+                <MdError /> Oops!
             </AlertTitle>
             <AlertDescription>---: {message}</AlertDescription>
         </Alert>
