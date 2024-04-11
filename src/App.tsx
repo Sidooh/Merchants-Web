@@ -7,6 +7,8 @@ import Default from '@/pages/default/Default.tsx';
 import OTP from '@/pages/auth/OTP.tsx';
 import NotFound from '@/pages/errors/NotFound.tsx';
 import ConfirmPin from '@/pages/auth/ConfirmPin.tsx';
+import MpesaFloatPurchase from '@/pages/mpesa-float/MpesaFloatPurchase.tsx';
+import VoucherTopUp from '@/pages/voucher-top-up/VoucherTopUp.tsx';
 
 function App() {
     return (
@@ -19,6 +21,8 @@ function App() {
 
             <Route element={<Middleware.Auth component={<MainLayout />} />}>
                 <Route index element={<Default />} />
+                <Route path={'/buy-mpesa-float'} element={<MpesaFloatPurchase />} />
+                <Route path={'/voucher-top-up'} element={<VoucherTopUp />} />
             </Route>
 
             <Route path={'*'} element={<NotFound />} />

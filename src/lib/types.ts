@@ -1,5 +1,7 @@
 import { ComponentType } from 'react';
 import { MerchantProduct, MerchantType, PaymentMethod, Status } from '@/lib/enums.ts';
+import { To } from 'react-router-dom';
+import { IconType } from 'react-icons';
 
 export interface ApiResponse<T> {
     result: 1 | 0;
@@ -19,6 +21,19 @@ export type OTPRequest = {
 };
 
 export type LoginResponse = { access_token: string };
+
+export type RouteChildType = {
+    name: string;
+    active?: boolean;
+    icon: IconType;
+    to: To;
+    disabled?: boolean;
+};
+
+export type RouteType = {
+    label: string;
+    children: RouteChildType[];
+};
 
 export type Model = {
     id: number;
@@ -73,7 +88,7 @@ export type Transaction = Model & {
     description: string;
     destination: string;
     merchant: number | Merchant;
-    product: string;
+    product: MerchantProduct;
     payment?: Payment;
 };
 
@@ -96,15 +111,18 @@ export type MpesaFloatPurchaseRequest = {
     debit_account?: string;
 };
 
-export type MpesaFloatPurchaseResponse = {
-    id: number;
+export type MpesaFloatPurchaseResponse = Transaction& {
     merchant_id: number;
-    description: string;
-    destination: string;
+};
+
+export type VoucherPurchaseRequest = {
+    merchant_id: number;
     amount: number;
-    payment: Payment;
-    product: MerchantProduct;
-    status: Status;
+    phone: string;
+};
+
+export type VoucherPurchaseResponse = Transaction & {
+    merchant_id: number;
 };
 
 export type PinConfirmationRequest = {

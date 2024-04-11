@@ -17,6 +17,7 @@ export enum PaymentMethod {
 
 export enum MerchantProduct {
     MPESA_FLOAT = 'MPESA_FLOAT',
+    FLOAT_PURCHASE = 'FLOAT_PURCHASE',
 }
 
 export enum MerchantType {

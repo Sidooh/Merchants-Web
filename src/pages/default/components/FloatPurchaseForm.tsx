@@ -114,7 +114,7 @@ const FloatPurchaseForm = () => {
                 <form onSubmit={form.handleSubmit(handleSubmit)}>
                     <Card>
                         <CardHeader>
-                            <CardTitle>Buy Float</CardTitle>
+                            <CardTitle>Buy MPESA Float</CardTitle>
                             <CardDescription>Select or add store below to purchase float.</CardDescription>
                         </CardHeader>
                         <CardContent className="grid gap-3">

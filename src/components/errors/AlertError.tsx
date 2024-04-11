@@ -21,14 +21,14 @@ const AlertError = forwardRef<HTMLDivElement, ServerErrorProps>(({ error, classN
                     }
                 }
                 if (error.status === 'FETCH_ERROR') {
-                    setMessage('...Nikama server iko down😞 please try again later.');
+                    setMessage('Our servers seem to be down😞 please try again later.');
                 }
             } else if (typeof error === 'string') {
                 setMessage(error);
             } else if (isErrorWithMessage(error)) {
                 setMessage(error.message);
             } else {
-                setMessage('...na sina fom shida ni gani lakini jaribu tu tena.🤡');
+                setMessage('Something went wrong! Kindly contact admin ASAP!');
             }
         }
     }, [error]);
@@ -38,7 +38,7 @@ const AlertError = forwardRef<HTMLDivElement, ServerErrorProps>(({ error, classN
     return (
         <Alert ref={ref} className={cn('text-red-600 text-start border-dashed border-red-600 p-3 mb-2', { className })}>
             <AlertTitle className={'flex items-center gap-1'}>
-                <MdError /> Makosa ilifanyika! 🌚
+                <MdError /> Oops!
             </AlertTitle>
             <AlertDescription>---: {message}</AlertDescription>
         </Alert>

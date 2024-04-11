@@ -2,6 +2,7 @@ export const CONFIG = {
     app: {
         name: 'Merchants App',
         version: 1.0,
+        session_timeout: import.meta.env.VITE_SESSION_TIMEOUT || 60_000,
     },
     services: {
         accounts: {

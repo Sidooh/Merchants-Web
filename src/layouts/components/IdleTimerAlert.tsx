@@ -12,6 +12,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog.tsx';
+import { CONFIG } from '@/config.ts';
 
 const timeout = 60_000;
 const promptBeforeIdle = Math.ceil(timeout / 3);
@@ -30,7 +31,7 @@ const IdleTimerAlert = () => {
         promptBeforeIdle,
         syncTimers: 200,
         throttle: 500,
-        timeout,
+        timeout: CONFIG.app.session_timeout,
     });
 
     const handleSignOut = () => dispatch(logout());
@@ -38,7 +39,7 @@ const IdleTimerAlert = () => {
     useEffect(() => {
         const interval = setInterval(() => {
             setRemaining(Math.ceil(getRemainingTime() / 1000));
-        }, 500);
+        }, 700);
 
         return () => clearInterval(interval);
     });
