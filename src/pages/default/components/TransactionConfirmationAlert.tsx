@@ -7,70 +7,72 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog.tsx';
-import { MpesaFloatPurchaseRequest, MpesaStore } from '@/lib/types.ts';
+import { Charge, MpesaFloatPurchaseRequest, VoucherPurchaseRequest } from '@/lib/types.ts';
 import { ArrowRightIcon } from '@radix-ui/react-icons';
 import { Separator } from '@/components/ui/separator.tsx';
-import { PaymentMethod } from '@/lib/enums.ts';
+import { MerchantProduct } from '@/lib/enums.ts';
 import { currencyFormat } from '@/lib/utils.ts';
-import { Dispatch, SetStateAction } from 'react';
-import { useGetFloatChargesQuery } from '@/services/payments/paymentsApi.ts';
+import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
+import {
+    useGetBuyGoodsChargesQuery,
+    useGetFloatChargesQuery,
+    useGetPayBillChargesQuery,
+} from '@/services/payments/paymentsApi.ts';
 
 type TransactionConfirmationAlertProps = {
-    values: MpesaFloatPurchaseRequest;
+    values: MpesaFloatPurchaseRequest | VoucherPurchaseRequest;
     open: boolean;
-    store?: MpesaStore;
     setOpen: Dispatch<SetStateAction<boolean>>;
     onConfirmed: () => void;
+    product: MerchantProduct;
+    children: ReactNode;
 };
 
 const TransactionConfirmationAlert = ({
     values,
-    store,
     open,
     setOpen,
     onConfirmed,
+    product,
+    children,
 }: TransactionConfirmationAlertProps) => {
-    const { data, isLoading } = useGetFloatChargesQuery();
+    console.log(!values.amount);
+    const { data: buyGoodsCharges, isLoading: isLoadingBuyGoods } = useGetBuyGoodsChargesQuery(undefined, {
+        skip: product === MerchantProduct.MPESA_FLOAT || !values.amount || values.amount >= 11000,
+    });
+    const { data: payBillCharges, isLoading: isLoadingPayBill } = useGetPayBillChargesQuery(undefined, {
+        skip: product === MerchantProduct.MPESA_FLOAT || !values.amount || values.amount < 11000,
+    });
+    const { data: floatCharges, isLoading: isLoadingFloat } = useGetFloatChargesQuery(undefined, {
+        skip: product === MerchantProduct.FLOAT_PURCHASE,
+    });
 
-    const charge = data?.find((c) => c.min <= values.amount && values.amount <= c.max);
+    const [charge, setCharge] = useState<Charge>();
+
+    useEffect(() => {
+        let charges: Charge[] = [];
+
+        if (buyGoodsCharges) charges = buyGoodsCharges;
+        if (payBillCharges) charges = payBillCharges;
+        if (floatCharges) charges = floatCharges;
+
+        setCharge(charges.find((c) => c.min <= values.amount && values.amount <= c.max));
+    }, [buyGoodsCharges, floatCharges, payBillCharges, values.amount]);
 
     return (
         <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogContent className={'max-w-xs'}>
                 <AlertDialogHeader className={'text-start'}>
                     <AlertDialogTitle>CONFIRM</AlertDialogTitle>
-                    {store && (
-                        <>
-                            <div className="space-y-1">
-                                <h4 className="text-xs text-muted-foreground font-medium leading-none">Store Name</h4>
-                                <p className="text-sm ">{store.name.split('-')[1]}</p>
-                            </div>
-                            <Separator className="my-4" />
-                        </>
-                    )}
-                    <div className="space-y-1">
-                        <h4 className="text-xs text-muted-foreground font-medium leading-none">Agent Number</h4>
-                        <p className="text-sm ">{values.agent}</p>
-                    </div>
-                    <Separator className="my-4" />
-                    <div className="space-y-1">
-                        <h4 className="text-xs text-muted-foreground font-medium leading-none">Store Number</h4>
-                        <p className="text-sm ">{values.store}</p>
-                    </div>
-                    <Separator className="my-4" />
-                    <div className="space-y-1">
-                        <h4 className="text-xs text-muted-foreground font-medium leading-none">Payment Method</h4>
-                        <p className="text-sm ">
-                            {values.method === PaymentMethod.FLOAT ? 'VOUCHER' : `MPESA - ${values.debit_account}`}
-                        </p>
-                    </div>
-                    <Separator className="my-4" />
+
+                    {children}
+
                     <div className="space-y-1">
                         <h4 className="text-xs text-muted-foreground font-medium leading-none">Amount</h4>
 
                         <div>
                             <p className="text-sm ">{currencyFormat(values.amount)}</p>
-                            {isLoading ? (
+                            {isLoadingPayBill || isLoadingBuyGoods || isLoadingFloat ? (
                                 <div className={'h-3 w-1/3 bg-slate-200 rounded'} />
                             ) : (
                                 <p className={'text-[7pt] text-muted-foreground font-medium'}>

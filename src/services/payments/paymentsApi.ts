@@ -5,8 +5,8 @@ import { ApiResponse, Charge } from '@/lib/types.ts';
 
 export const paymentsApi = createApi({
     reducerPath: 'paymentsApi',
-    tagTypes: ['FloatAccount', 'Charge'],
-    keepUnusedDataFor: 60 * 7, //  Seven Minutes
+    tagTypes: ['FloatAccount', 'FloatCharge', 'PayBillCharge', 'BuyGoodsCharge'],
+    keepUnusedDataFor: 60 * 60 * 60, //  Seven Minutes
     baseQuery: fetchBaseQuery({
         baseUrl: CONFIG.services.payments.api.url,
         prepareHeaders: async (headers) => {
@@ -18,16 +18,34 @@ export const paymentsApi = createApi({
         },
     }),
     endpoints: (build) => ({
+        getBuyGoodsCharges: build.query<Charge[], void>({
+            query: () => '/charges/buy-goods',
+            transformResponse: (val: ApiResponse<Charge[]>) => val.data,
+            providesTags: (result) =>
+                providesList(
+                    result?.map((r, i) => ({ ...r, id: i })),
+                    'BuyGoodsCharge'
+                ),
+        }),
         getFloatCharges: build.query<Charge[], void>({
             query: () => '/charges/mpesa-float',
             transformResponse: (val: ApiResponse<Charge[]>) => val.data,
             providesTags: (result) =>
                 providesList(
                     result?.map((r, i) => ({ ...r, id: i })),
-                    'Charge'
+                    'FloatCharge'
+                ),
+        }),
+        getPayBillCharges: build.query<Charge[], void>({
+            query: () => '/charges/pay-bill',
+            transformResponse: (val: ApiResponse<Charge[]>) => val.data,
+            providesTags: (result) =>
+                providesList(
+                    result?.map((r, i) => ({ ...r, id: i })),
+                    'PayBillCharge'
                 ),
         }),
     }),
 });
 
-export const { useGetFloatChargesQuery } = paymentsApi;
+export const { useGetBuyGoodsChargesQuery, useGetFloatChargesQuery, useGetPayBillChargesQuery } = paymentsApi;
