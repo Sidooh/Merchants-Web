@@ -36,7 +36,6 @@ const TransactionConfirmationAlert = ({
     product,
     children,
 }: TransactionConfirmationAlertProps) => {
-    console.log(!values.amount);
     const { data: buyGoodsCharges, isLoading: isLoadingBuyGoods } = useGetBuyGoodsChargesQuery(undefined, {
         skip: product === MerchantProduct.MPESA_FLOAT || !values.amount || values.amount >= 11000,
     });

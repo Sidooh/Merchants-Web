@@ -39,6 +39,7 @@ const VoucherTopUp = () => {
 
     const handleTransactionConfirmed = () => {
         const values = form.getValues();
+        values.amount = Number(values.amount);
 
         sendPurchaseRequest(values)
             .unwrap()
@@ -72,6 +73,8 @@ const VoucherTopUp = () => {
                                             <Input
                                                 placeholder="e.g: 200,000"
                                                 type={'number'}
+                                                min={10}
+                                                max={250000}
                                                 {...form.register('amount')}
                                             />
                                         </FormControl>

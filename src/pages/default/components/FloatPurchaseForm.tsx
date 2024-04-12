@@ -233,6 +233,8 @@ const FloatPurchaseForm = () => {
                                                 <Input
                                                     placeholder="e.g: 200,000"
                                                     type={'number'}
+                                                    min={10}
+                                                    max={250000}
                                                     {...form.register('amount')}
                                                 />
                                             </FormControl>
