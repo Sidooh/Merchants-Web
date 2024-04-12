@@ -20,13 +20,14 @@ import { useEffect, useState } from 'react';
 import { useBuyMpesaFloatMutation, useGetMpesaStoresQuery } from '@/services/merchants/merchantsEndpoints.ts';
 import { useAuth } from '@/hooks/useAuth.ts';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
-import { PaymentMethod } from '@/lib/enums.ts';
+import { MerchantProduct, PaymentMethod } from '@/lib/enums.ts';
 import { toast } from '@/lib/utils.ts';
 import { SAFARICOM_REGEX } from '@/constants';
 import SubmitButton from '@/components/common/SubmitButton.tsx';
 import { useGetFloatAccountQuery } from '@/services/payments/floatEndpoints.ts';
 import PinConfirmationForm from '@/pages/default/components/PinConfirmationForm.tsx';
 import TransactionConfirmationAlert from '@/pages/default/components/TransactionConfirmationAlert.tsx';
+import { Separator } from '@/components/ui/separator.tsx';
 
 const formSchema = yup.object({
     merchant_id: yup.number().integer().required(),
@@ -316,12 +317,41 @@ const FloatPurchaseForm = () => {
             />
 
             <TransactionConfirmationAlert
+                product={MerchantProduct.MPESA_FLOAT}
                 open={openTransactionConfirmationAlert}
                 values={form.getValues()}
-                store={selectedStore}
                 setOpen={setOpenTransactionConfirmationAlert}
                 onConfirmed={handleTransactionConfirmed}
-            />
+            >
+                {selectedStore && (
+                    <>
+                        <div className="space-y-1">
+                            <h4 className="text-xs text-muted-foreground font-medium leading-none">Store Name</h4>
+                            <p className="text-sm ">{selectedStore.name.split('-')[1]}</p>
+                        </div>
+                        <Separator className="my-4" />
+                    </>
+                )}
+                <div className="space-y-1">
+                    <h4 className="text-xs text-muted-foreground font-medium leading-none">Agent Number</h4>
+                    <p className="text-sm ">{form.getValues('agent')}</p>
+                </div>
+                <Separator className="my-4" />
+                <div className="space-y-1">
+                    <h4 className="text-xs text-muted-foreground font-medium leading-none">Store Number</h4>
+                    <p className="text-sm ">{form.getValues('store')}</p>
+                </div>
+                <Separator className="my-4" />
+                <div className="space-y-1">
+                    <h4 className="text-xs text-muted-foreground font-medium leading-none">Payment Method</h4>
+                    <p className="text-sm ">
+                        {form.getValues('method') === PaymentMethod.FLOAT
+                            ? 'VOUCHER'
+                            : `MPESA - ${form.getValues('debit_account')}`}
+                    </p>
+                </div>
+                <Separator className="my-4" />
+            </TransactionConfirmationAlert>
         </>
     );
 };
