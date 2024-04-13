@@ -5,6 +5,7 @@ import { Status } from '@/lib/enums.ts';
 import { getStatusIcon, getUniquePropertyValues } from '@/lib/utils.ts';
 
 type TransactionsTableProps = { title?: string; transactions: Transaction[]; hideMerchantCol?: boolean };
+
 const TransactionsTable = ({
     title = 'Transactions',
     transactions,

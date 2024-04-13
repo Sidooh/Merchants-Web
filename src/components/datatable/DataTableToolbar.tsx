@@ -3,22 +3,35 @@ import { Button } from '@/components/ui/button.tsx';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { Table } from '@tanstack/react-table';
 import { FacetedFilterType } from '@/lib/types.ts';
-import { ReactNode } from 'react';
 import { DataTableViewOptions } from '@/components/datatable/DataTableViewOptions.tsx';
+import { CalendarDateRangePicker } from '@/components/common/CalendarDateRangePicker.tsx';
+import DebouncedInput from '@/components/common/DebouncedInput.tsx';
 
 interface DataTableToolbarProps<TData> {
     table: Table<TData>;
-    globalFilter: ReactNode;
+    globalFilter: string;
+    onGlobalFilterChange: (value: string | number) => void;
     facetedFilters?: FacetedFilterType[];
 }
 
-export function DataTableToolbar<TData>({ table, facetedFilters, globalFilter }: DataTableToolbarProps<TData>) {
+export function DataTableToolbar<TData>({
+    table,
+    facetedFilters,
+    globalFilter,
+    onGlobalFilterChange,
+}: DataTableToolbarProps<TData>) {
     const isFiltered = table.getState().columnFilters.length > 0;
 
     return (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
             <div className="flex flex-1 items-center space-x-2">
-                {globalFilter}
+                <DebouncedInput
+                    type={'search'}
+                    placeholder={'Filter columns...'}
+                    value={globalFilter ?? ''}
+                    onChange={(v) => onGlobalFilterChange(v)}
+                    className="h-8 w-[150px] lg:w-[250px]"
+                />
 
                 {facetedFilters?.map(
                     (f) =>
@@ -38,6 +51,11 @@ export function DataTableToolbar<TData>({ table, facetedFilters, globalFilter }:
                     </Button>
                 )}
             </div>
+            <CalendarDateRangePicker
+                onDateChange={(dateRange) =>
+                    table.getColumn('created_at')?.setFilterValue(() => [dateRange?.from, dateRange?.to])
+                }
+            />
             <DataTableViewOptions table={table} />
         </div>
     );

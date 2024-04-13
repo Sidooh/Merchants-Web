@@ -43,6 +43,7 @@ export const columns: ColumnDef<Transaction>[] = [
     {
         accessorKey: 'created_at',
         header: 'Created',
+        filterFn: 'dateBetweenFilterFn',
         cell: ({ row: { original: t } }) => {
             const { date, time } = getRelativeDateAndTime(t.created_at);
 

@@ -21,9 +21,9 @@ import { DataTablePagination } from '@/components/datatable/DataTablePagination.
 import { CaretDownIcon, CaretSortIcon, CaretUpIcon } from '@radix-ui/react-icons';
 import DataTableToolbar from '@/components/datatable/DataTableToolbar.tsx';
 import { FacetedFilterType } from '@/lib/types.ts';
-import { Input } from '@/components/ui/input.tsx';
-import { rankItem } from '@tanstack/match-sorter-utils';
+import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
 import { Checkbox } from '@/components/ui/checkbox.tsx';
+import dateBetweenFilterFn from '@/lib/date-between-filter.ts';
 
 interface DataTableProps<TData, TValue> {
     title?: string;
@@ -32,22 +32,32 @@ interface DataTableProps<TData, TValue> {
     facetedFilters?: FacetedFilterType[];
 }
 
+declare module '@tanstack/table-core' {
+    interface FilterFns {
+        fuzzy: FilterFn<unknown>;
+        dateBetweenFilterFn: FilterFn<unknown>;
+    }
+    interface FilterMeta {
+        itemRank: RankingInfo;
+    }
+}
+
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+    // Rank the item
+    const itemRank = rankItem(row.getValue(columnId), value);
+
+    // Store the ranking info
+    addMeta({ itemRank });
+
+    // Return if the item should be filtered in/out
+    return itemRank.passed;
+};
+
 export function DataTable<TData, TValue>({ title, columns, data, facetedFilters }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-
-    const fuzzyFilter: FilterFn<TData> = (row, columnId, value, addMeta) => {
-        // Rank the item
-        const itemRank = rankItem(row.getValue(columnId), value);
-
-        // Store the ranking info
-        addMeta(itemRank);
-
-        // Return if the item should be filtered in/out
-        return itemRank.passed;
-    };
 
     const table = useReactTable({
         state: {
@@ -55,6 +65,11 @@ export function DataTable<TData, TValue>({ title, columns, data, facetedFilters 
             columnFilters,
             globalFilter,
             rowSelection,
+        },
+
+        filterFns: {
+            fuzzy: fuzzyFilter,
+            dateBetweenFilterFn: dateBetweenFilterFn,
         },
 
         data,
@@ -111,15 +126,8 @@ export function DataTable<TData, TValue>({ title, columns, data, facetedFilters 
             <DataTableToolbar
                 table={table}
                 facetedFilters={facetedFilters}
-                globalFilter={
-                    <Input
-                        type={'search'}
-                        placeholder={'Filter columns...'}
-                        value={globalFilter ?? ''}
-                        onChange={(e) => setGlobalFilter(e.target.value)}
-                        className="h-8 w-[150px] lg:w-[250px]"
-                    />
-                }
+                globalFilter={globalFilter}
+                onGlobalFilterChange={(v) => setGlobalFilter(String(v))}
             />
 
             <Table>

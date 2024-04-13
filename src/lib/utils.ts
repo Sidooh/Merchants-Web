@@ -113,9 +113,6 @@ export const getAuthToken = async () => {
     let token = JSON.parse(String(localStorage.getItem('token')));
 
     const expiresAt = moment.unix(decodeJWT(token).exp);
-    // const expiresIn = expiresAt.diff(moment(), 'minutes');
-    //
-    // console.info(`Session expires in: ${expiresIn} minutes`);
 
     if (moment().add(3, 'm').isAfter(expiresAt)) {
         token = await authApi.authenticateService();
