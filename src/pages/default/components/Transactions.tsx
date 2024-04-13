@@ -7,7 +7,7 @@ import { Transaction } from '@/lib/types.ts';
 
 const Transactions = () => {
     const { user } = useAuth();
-    let { data } = useGetTransactionsQuery({ merchants: user?.merchant_id, days: 1 });
+    let { data } = useGetTransactionsQuery({ merchants: user?.merchant_id });
     const { data: stores } = useGetMpesaStoresQuery(user!.merchant_id);
 
     if (!data) return <Skeleton className={'h-[500px]'} />;
