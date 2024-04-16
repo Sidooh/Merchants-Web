@@ -92,6 +92,7 @@ const ConfirmPin = () => {
                         />
 
                         <SubmitButton
+                            className={'w-full'}
                             disabled={isLoading || !form.formState.isValid}
                             isLoading={isLoading}
                             text={'Confirm'}
