@@ -11,7 +11,8 @@ import { MerchantEarningAccountType } from '@/lib/enums.ts';
 type BalanceProps = { earningAccount?: MerchantEarningAccount; isLoading: boolean };
 
 const Balance = ({ earningAccount, isLoading }: BalanceProps) => {
-    if (!earningAccount || isLoading) return <Skeleton className={'h-32'} />;
+    if (isLoading) return <Skeleton className={'h-32'} />;
+    if (!earningAccount) return <></>;
 
     return (
         <Card>

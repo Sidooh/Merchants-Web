@@ -25,22 +25,22 @@ const CashbackBalance = () => {
         }
     }, [earningAccounts]);
 
-    if (!earningAccounts || isLoading) return <Skeleton className={'h-32 col-span-3'} />;
+    if (!earningAccounts || isLoading) return <Skeleton className={'h-80 lg:h-32 lg:col-span-3'} />;
 
     return (
         <Card className="grid grid-cols-1 md:grid-cols-3 divide-x">
-            <div className={'bg-gradient-to-t lg:bg-gradient-to-l from-card to-primary'}>
+            <div>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-bold text-yellow-300">Total Balance</CardTitle>
+                    <CardTitle className="text-sm font-bold text-primary/70">Total Balance</CardTitle>
                     <FaMoneyBills />
                 </CardHeader>
                 <CardContent className="text-2xl font-bold">
                     <CountUp
                         end={cashbackAccount?.balance! + commissionAccount?.balance!}
                         prefix={'KSH '}
-                        className={'text-yellow-300'}
+                        className={'text-primary'}
                     />
-                    <p className="text-xs text-yellow-300/80">
+                    <p className="text-xs text-primary/80">
                         <CountUp
                             end={commissionAccount?.interest! + commissionAccount?.interest!}
                             prefix={'+KSH '}
