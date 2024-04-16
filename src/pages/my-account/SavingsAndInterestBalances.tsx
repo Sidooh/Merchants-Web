@@ -31,27 +31,6 @@ const CashbackBalance = () => {
         <Card className="grid grid-cols-1 md:grid-cols-3 divide-x">
             <div>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-bold text-primary/70">Total Balance</CardTitle>
-                    <FaMoneyBills />
-                </CardHeader>
-                <CardContent className="text-2xl font-bold">
-                    <CountUp
-                        end={cashbackAccount?.balance! + commissionAccount?.balance!}
-                        prefix={'KSH '}
-                        className={'text-primary'}
-                    />
-                    <p className="text-xs text-primary/80">
-                        <CountUp
-                            end={commissionAccount?.interest! + commissionAccount?.interest!}
-                            prefix={'+KSH '}
-                            suffix={' interest'}
-                        />
-                    </p>
-                </CardContent>
-            </div>
-
-            <div>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-muted-foreground">Saved Cashback</CardTitle>
                     <FaMoneyBills />
                 </CardHeader>
@@ -72,6 +51,27 @@ const CashbackBalance = () => {
                     <CountUp end={commissionAccount?.balance!} prefix={'KSH '} />
                     <p className="text-xs text-muted-foreground">
                         <CountUp end={commissionAccount?.interest!} prefix={'+KSH '} suffix={' interest'} />
+                    </p>
+                </CardContent>
+            </div>
+
+            <div>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-bold text-primary/70">Total Balance</CardTitle>
+                    <FaMoneyBills />
+                </CardHeader>
+                <CardContent className="text-2xl font-bold">
+                    <CountUp
+                        end={cashbackAccount?.balance! + commissionAccount?.balance!}
+                        prefix={'KSH '}
+                        className={'text-primary'}
+                    />
+                    <p className="text-xs text-primary/80">
+                        <CountUp
+                            end={commissionAccount?.interest! + commissionAccount?.interest!}
+                            prefix={'+KSH '}
+                            suffix={' interest'}
+                        />
                     </p>
                 </CardContent>
             </div>
