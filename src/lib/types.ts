@@ -13,11 +13,23 @@ export interface ApiResponse<T> {
 export type LoginRequest = {
     phone: string;
     store_no: string;
-    is_refresh_token?: boolean;
+};
+
+export type UpdateKybRequest = {
+    business_name: string;
+    landmark: string;
+};
+
+export type CreateMerchantRequest = {
+    first_name: string;
+    last_name: string;
+    id_number: string;
+    account_id: number;
 };
 
 export type OTPRequest = {
-    pin: string;
+    phone: string;
+    otp: number;
 };
 
 export type LoginResponse = { access_token: string };
@@ -111,7 +123,7 @@ export type MpesaFloatPurchaseRequest = {
     debit_account?: string;
 };
 
-export type MpesaFloatPurchaseResponse = Transaction& {
+export type MpesaFloatPurchaseResponse = Transaction & {
     merchant_id: number;
 };
 
@@ -130,11 +142,17 @@ export type PinConfirmationRequest = {
     pin: string;
 };
 
-export type NotifyRequest = {
-    channel: string;
-    destination: number | number[];
-    event_type?: string;
-    content: string;
+export type Charge = { min: number; max: number; charge: number };
+
+export type GenerateOTPRequest = {
+    phone: string;
+};
+export type VerifyOTPRequest = {
+    phone: string;
+    otp: number | string;
 };
 
-export type Charge = { min: number; max: number; charge: number };
+export type CreateAccountRequest = {
+    phone: string;
+    invite_code: string;
+};

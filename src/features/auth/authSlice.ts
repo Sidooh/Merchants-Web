@@ -1,6 +1,6 @@
 import { createAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { authApi } from './authApi';
-import { LoginRequest, OTPRequest } from '@/lib/types.ts';
+import { LoginRequest } from '@/lib/types.ts';
 
 export type AuthState = {
     isError: boolean;
@@ -37,17 +37,10 @@ export const login = createAsyncThunk('auth/login', async (user: LoginRequest, t
     }
 });
 
-export const verifyOTP = createAsyncThunk('auth/verifyOTP', async (data: OTPRequest, thunkAPI) => {
-    try {
-        return await authApi.verifyOTP(data);
-    } catch (err: unknown) {
-        return thunkAPI.rejectWithValue((err as { message: string }).message);
-    }
-});
-
 export const logout = createAction('auth/logout');
 
 export const idle = createAction<boolean>('auth/idle');
+export const hasOtp = createAction<boolean>('auth/has_otp');
 
 export const authSlice = createSlice({
     name: 'auth',
@@ -77,26 +70,21 @@ export const authSlice = createSlice({
                 state.user = undefined;
             })
 
-            .addCase(verifyOTP.pending, (state) => {
-                state.isLoading = true;
-            })
-            .addCase(verifyOTP.fulfilled, (state, action) => {
-                if (state.user) state.user.has_otp = Boolean(action.payload);
-                state.isLoading = false;
-                state.isSuccess = true;
-            })
-            .addCase(verifyOTP.rejected, (state, action) => {
-                state.isLoading = false;
-                state.isError = true;
-                state.message = String(action.payload);
-                if (state.user) state.user.has_otp = false;
-            })
-
             .addCase(logout, (state) => {
                 localStorage.removeItem('user');
                 localStorage.removeItem('token');
 
                 state.user = undefined;
+            })
+
+            .addCase(hasOtp, (state, action) => {
+                const user: AuthState['user'] = JSON.parse(String(localStorage.getItem('user')));
+
+                if (user) user['has_otp'] = action.payload;
+
+                localStorage.setItem('user', JSON.stringify(user));
+
+                state.user = user;
             })
 
             .addCase(idle, (state, action) => {

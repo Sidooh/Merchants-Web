@@ -4,10 +4,10 @@ import { getAuthToken } from '@/lib/utils.ts';
 
 export const accountsApi = createApi({
     reducerPath: 'accountsApi',
-    tagTypes: [],
+    tagTypes: ['Account'],
     keepUnusedDataFor: 60 * 7, //  Seven Minutes
     baseQuery: fetchBaseQuery({
-        baseUrl: `${CONFIG.services.accounts.api.url}/accounts`,
+        baseUrl: `${CONFIG.services.accounts.api.url}`,
         prepareHeaders: async (headers) => {
             const token = await getAuthToken();
 

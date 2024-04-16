@@ -16,8 +16,6 @@ export const Middleware = {
         if (user) {
             if (location.pathname !== '/otp') return <Navigate to={'/otp'} replace />;
             if (user.is_idle) return <Navigate to="/pin-confirmation" replace />;
-        } else if (location.pathname !== '/login') {
-            return <Navigate to={'/login'} replace />;
         }
 
         return component;
