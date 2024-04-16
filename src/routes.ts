@@ -34,7 +34,7 @@ const routes: RouteType[] = [
         children: [
             {
                 name: 'My Account',
-                to: '/account',
+                to: '/my-account',
                 icon: RiAccountPinCircleLine,
             },
         ],

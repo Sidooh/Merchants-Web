@@ -10,7 +10,7 @@ import ConfirmPin from '@/pages/auth/ConfirmPin.tsx';
 import MpesaFloatPurchase from '@/pages/mpesa-float/MpesaFloatPurchase.tsx';
 import VoucherTopUp from '@/pages/voucher-top-up/VoucherTopUp.tsx';
 import Onboarding from '@/pages/auth/Onboarding/Onboarding.tsx';
-import MyAccount from '@/pages/account/MyAccount.tsx';
+import MyAccount from '@/pages/my-account/MyAccount.tsx';
 
 function App() {
     return (
@@ -26,7 +26,7 @@ function App() {
                 <Route index element={<Default />} />
                 <Route path={'/buy-mpesa-float'} element={<MpesaFloatPurchase />} />
                 <Route path={'/voucher-top-up'} element={<VoucherTopUp />} />
-                <Route path={'/account'} element={<MyAccount />} />
+                <Route path={'/my-account'} element={<MyAccount />} />
             </Route>
 
             <Route path={'*'} element={<NotFound />} />

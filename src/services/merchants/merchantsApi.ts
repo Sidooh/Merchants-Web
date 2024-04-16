@@ -4,7 +4,7 @@ import { getAuthToken } from '@/lib/utils.ts';
 
 export const merchantsApi = createApi({
     reducerPath: 'merchantsApi',
-    tagTypes: ['Merchant', 'Transaction', 'MpesaStore'],
+    tagTypes: ['Merchant', 'Transaction', 'MpesaStore', 'EarningAccount'],
     keepUnusedDataFor: 60 * 7, //  Seven Minutes
     baseQuery: fetchBaseQuery({
         baseUrl: CONFIG.services.merchants.api.url,
