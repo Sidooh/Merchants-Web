@@ -34,7 +34,7 @@ const OTP = () => {
 
     const [phone, setPhone] = useState(location.state?.phone || user?.phone);
     const [error, setError] = useState('');
-    const [timer, setTimer] = useState(3);
+    const [timer, setTimer] = useState(60);
 
     const form = useForm<yup.InferType<typeof formSchema>>({
         resolver: yupResolver(formSchema),
