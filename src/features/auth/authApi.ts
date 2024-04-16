@@ -90,16 +90,4 @@ export const authApi = {
             }
         }
     },
-    sendOTP: async (phone: string, tries = 0) => {
-        // Generate OTP and send to user
-        try {
-            ``;
-            await axios.post(`${CONFIG.services.accounts.api.url}/otp/generate`, { phone });
-        } catch (e: unknown) {
-            if (axios.isAxiosError(e) && e.response?.status === 401 && tries < 2) {
-                await authApi.authenticateService();
-                await authApi.sendOTP(phone, tries + 1);
-            }
-        }
-    },
 };
