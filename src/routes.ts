@@ -1,7 +1,7 @@
-import { FaChartPie } from 'react-icons/fa6';
 import { GrTransaction } from 'react-icons/gr';
 import { RouteType } from '@/lib/types';
-import { MdSupportAgent } from 'react-icons/md';
+import { MdOutlineDashboard, MdSupportAgent } from 'react-icons/md';
+import { RiAccountPinCircleLine } from 'react-icons/ri';
 
 const routes: RouteType[] = [
     {
@@ -10,7 +10,7 @@ const routes: RouteType[] = [
             {
                 name: 'Home',
                 to: '/',
-                icon: FaChartPie,
+                icon: MdOutlineDashboard,
             },
         ],
     },
@@ -26,6 +26,16 @@ const routes: RouteType[] = [
                 name: 'Voucher Top Up',
                 to: '/voucher-top-up',
                 icon: GrTransaction,
+            },
+        ],
+    },
+    {
+        label: 'User',
+        children: [
+            {
+                name: 'My Account',
+                to: '/my-account',
+                icon: RiAccountPinCircleLine,
             },
         ],
     },

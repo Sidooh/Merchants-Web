@@ -5,7 +5,7 @@ import { ApiResponse, Charge } from '@/lib/types.ts';
 
 export const paymentsApi = createApi({
     reducerPath: 'paymentsApi',
-    tagTypes: ['FloatAccount', 'FloatCharge', 'PayBillCharge', 'BuyGoodsCharge'],
+    tagTypes: ['FloatAccount', 'FloatCharge', 'PayBillCharge', 'BuyGoodsCharge', 'Voucher'],
     keepUnusedDataFor: 60 * 60 * 60, //  Seven Minutes
     baseQuery: fetchBaseQuery({
         baseUrl: CONFIG.services.payments.api.url,

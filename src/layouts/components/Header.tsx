@@ -48,13 +48,16 @@ const Header = () => {
 
     return (
         <header
-            className={cn('sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60', {
-                'shadow-[0_.5rem_.5rem_-.5rem_#0003]': showDropShadow,
-            })}
+            className={cn(
+                'sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60',
+                {
+                    'shadow-[0_.5rem_.5rem_-.5rem_#0003]': showDropShadow,
+                }
+            )}
         >
             <div className="container flex h-14 items-center justify-between px-3 md:px-8 py-4">
                 <div className="flex md:gap-10">
-                    <MobileNav/>
+                    <MobileNav />
 
                     <Link to="/">
                         <Logo className={'w-20'} />
@@ -83,6 +86,11 @@ const Header = () => {
                                 </div>
                             </div>
                             <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                                <Link to="/my-account" className={'w-full'}>
+                                    My Account
+                                </Link>
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                                 className="cursor-pointer"
                                 onSelect={(e) => {

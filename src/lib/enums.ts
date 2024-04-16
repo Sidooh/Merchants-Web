@@ -29,3 +29,20 @@ export enum OnboardingStage {
     INVITE_CODE = 'INVITE_CODE',
     KYC = 'KYC',
 }
+
+export enum VoucherType {
+    SIDOOH = 'SIDOOH',
+}
+
+export enum MerchantEarningAccountType {
+    CASHBACK = 'CASHBACK',
+    COMMISSION = 'COMMISSION',
+}
+
+export enum SavingsEarningAccountType {
+    CURRENT = 'CURRENT',
+    LOCKED = 'LOCKED',
+    MERCHANT = 'MERCHANT',
+    MERCHANT_CASHBACK = 'MERCHANT_CASHBACK',
+    MERCHANT_COMMISSION = 'MERCHANT_COMMISSION',
+}

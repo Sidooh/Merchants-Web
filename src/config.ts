@@ -20,9 +20,9 @@ export const CONFIG = {
                 url: import.meta.env.VITE_PAYMENTS_API_URL,
             },
         },
-        notify: {
+        savings: {
             api: {
-                url: import.meta.env.VITE_NOTIFY_API_URL,
+                url: import.meta.env.VITE_SAVINGS_API_URL,
             },
         },
     },
