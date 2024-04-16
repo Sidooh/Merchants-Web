@@ -14,6 +14,8 @@ import { toast } from '@/lib/utils';
 import { CONFIG } from '@/config';
 import { SAFARICOM_REGEX } from '@/constants';
 import SubmitButton from '@/components/common/SubmitButton.tsx';
+import { Link, useNavigate } from 'react-router-dom';
+import { useGenerateOTPMutation } from '@/services/accounts/authEndpoints.ts';
 
 const formSchema = yup.object({
     phone: yup.string().matches(SAFARICOM_REGEX, { message: 'Invalid phone number' }).required('Phone is required.'),
@@ -21,8 +23,12 @@ const formSchema = yup.object({
 });
 
 const Login = () => {
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { user, isError, isSuccess, isLoading, message } = useAuth();
+
+    const [generateOtp] = useGenerateOTPMutation();
+
     const form = useForm<LoginRequest>({
         mode: 'onBlur',
         resolver: yupResolver(formSchema),
@@ -32,25 +38,32 @@ const Login = () => {
         },
     });
 
-    const handleSubmit: SubmitHandler<LoginRequest> = (values) => dispatch(login(values));
+    const handleSubmit: SubmitHandler<LoginRequest> = async (values) => {
+        const acc = await dispatch(login(values)).unwrap();
+
+        if (acc?.account_id) {
+            generateOtp({ phone: form.getValues('phone') });
+        }
+    };
 
     useEffect(() => {
         if (isError) toast({ titleText: message, icon: 'error' });
+        if (isSuccess) navigate('/otp');
 
         dispatch(reset());
-    }, [user, isError, isSuccess, message, dispatch]);
+    }, [user, isError, isSuccess, message]);
 
     return (
         <Card className={'p-5 h-full lg:max-w-3xl lg:min-w-[30rem] relative shadow-xl border-0'}>
             <CardHeader>
                 <CardTitle className={'text-end text-primary'}>
-                    Welcome
+                    Sign In
                     <hr className="mt-3 w-1/2 ms-auto" />
                 </CardTitle>
             </CardHeader>
             <CardContent>
                 <Form {...form}>
-                    <form className="space-y-5 w-full" onSubmit={form.handleSubmit(handleSubmit)}>
+                    <form className="grid grid-cols-1 gap-3" onSubmit={form.handleSubmit(handleSubmit)}>
                         <FormField
                             control={form.control}
                             name="phone"
@@ -90,6 +103,12 @@ const Login = () => {
                             disabled={isLoading || !form.formState.isValid}
                             icon={AiOutlineLogin}
                         />
+                        <small>
+                            Haven't onboarded yet?{' '}
+                            <Link to={'/onboarding'} className={'font-semibold text-primary underline'}>
+                                Onboard
+                            </Link>
+                        </small>
                     </form>
                 </Form>
             </CardContent>

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { OTPRequest } from '@/lib/types';
+import { VerifyOTPRequest } from '@/lib/types';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { CONFIG } from '@/config';
@@ -9,59 +9,45 @@ import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/comp
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { cn, toast } from '@/lib/utils.ts';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/useAuth.ts';
 import { useAppDispatch } from '@/app/store.ts';
-import { reset, verifyOTP } from '@/features/auth/authSlice.ts';
+import { hasOtp, reset } from '@/features/auth/authSlice.ts';
 import { BiRotateLeft } from 'react-icons/bi';
-import { authApi } from '@/features/auth/authApi.ts';
+import AlertError from '@/components/errors/AlertError.tsx';
+import { useGenerateOTPMutation, useVerifyOTPMutation } from '@/services/accounts/authEndpoints.ts';
+import { useAuth } from '@/hooks/useAuth.ts';
 
 const formSchema = yup.object({
-    pin: yup.string().min(6, 'Your one-time password must be 6 digits.').required(),
+    phone: yup.string().required('Phone is required.'),
+    otp: yup.string().required('OTP is required'),
 });
 
 const OTP = () => {
-    const { user, isError, isSuccess, message } = useAuth();
+    const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const [timer, setTimer] = useState(60);
-    const [isLoadingOTP, setIsLoadingOTP] = useState(false);
+    const { user } = useAuth();
 
-    const form = useForm<OTPRequest>({
+    const [generateOtp, { isLoading: isLoadingOtp }] = useGenerateOTPMutation();
+    const [verifyOTP] = useVerifyOTPMutation();
+
+    const [phone, setPhone] = useState(location.state?.phone || user?.phone);
+    const [error, setError] = useState('');
+    const [timer, setTimer] = useState(3);
+
+    const form = useForm<yup.InferType<typeof formSchema>>({
         resolver: yupResolver(formSchema),
         defaultValues: {
-            pin: '',
+            phone: phone,
         },
     });
 
     useEffect(() => {
-        if (isError) toast({ titleText: message, icon: 'error' });
-        if (isSuccess && user?.has_otp) {
-            toast({ titleText: 'OTP Verified!', text: `Welcome back ${user?.name}` });
+        setPhone(location.state?.phone || user?.phone);
 
-            navigate('/');
-        }
-
-        dispatch(reset());
-    }, [isSuccess, isError]);
-
-    const resendOTP = async () => {
-        setIsLoadingOTP(true);
-        setTimer(4);
-
-        try {
-            await authApi.sendOTP(user!.phone);
-
-            toast({ titleText: 'A new OTP has been sent to your phone.' });
-
-            setIsLoadingOTP(false);
-        } catch (_: unknown) {
-            toast({ titleText: 'Something went wrong. Kindly contact admin.', icon: 'error' });
-
-            setIsLoadingOTP(false);
-        }
-    };
+        if (!phone) navigate('/login');
+    }, [location, user]);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -72,7 +58,38 @@ const OTP = () => {
         return () => clearInterval(interval);
     }, [timer]);
 
-    const handleSubmit: SubmitHandler<OTPRequest> = async (data) => dispatch(verifyOTP(data));
+    const handleSubmit: SubmitHandler<VerifyOTPRequest> = async (data) => {
+        data.otp = Number(data.otp);
+
+        verifyOTP(data)
+            .unwrap()
+            .then(() => {
+                dispatch(reset());
+
+                if (user) {
+                    dispatch(hasOtp(true));
+
+                    navigate('/');
+                } else {
+                    toast({ titleText: 'Verified!' });
+
+                    navigate(location.state.next, { state: location.state });
+                }
+            })
+            .catch((err) => {
+                if (err.status === 400) setError('Invalid OTP!');
+            });
+    };
+
+    const resendOtp = () => {
+        if (timer === 0) {
+            form.reset();
+
+            setTimer(60);
+
+            generateOtp({ phone });
+        }
+    };
 
     return (
         <Card className={'p-5 h-full lg:max-w-3xl lg:min-w-[30rem] relative shadow-xl border-0'}>
@@ -81,10 +98,10 @@ const OTP = () => {
                     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                         <FormField
                             control={form.control}
-                            name="pin"
+                            name="otp"
                             render={({ field }) => (
                                 <FormItem>
-                                    <div className="py-6">
+                                    <div className="py-5 space-y-3">
                                         <FormLabel className={'font-semibold leading-none tracking-tight text-md'}>
                                             One-Time Password
                                         </FormLabel>
@@ -92,6 +109,7 @@ const OTP = () => {
                                         <FormDescription>
                                             Please enter the one-time password sent to your phone.
                                         </FormDescription>
+                                        <AlertError error={error} className={'mt-4'} />
                                     </div>
                                     <FormControl>
                                         <InputOTP
@@ -125,12 +143,13 @@ const OTP = () => {
                         <div className={'text-sm flex gap-1'}>
                             <small className={'text-muted-foreground'}>Didn't get the code? </small>
                             <small
-                                className={cn('flex items-center gap-1 cursor-pointer underline', {
+                                className={cn('flex items-center gap-1 underline', {
                                     'text-gray-400': timer > 0,
+                                    'cursor-pointer': timer === 0,
                                 })}
-                                onClick={() => resendOTP()}
+                                onClick={resendOtp}
                             >
-                                {isLoadingOTP ? (
+                                {isLoadingOtp ? (
                                     <>
                                         Resending... <ReloadIcon className="ms-2 h-4 w-4 animate-spin" />
                                     </>

@@ -23,3 +23,9 @@ export enum MerchantProduct {
 export enum MerchantType {
     MPESA_STORE = 'MPESA_STORE',
 }
+
+export enum OnboardingStage {
+    PHONE_VERIFICATION = 'PHONE_VERIFICATION',
+    INVITE_CODE = 'INVITE_CODE',
+    KYC = 'KYC',
+}

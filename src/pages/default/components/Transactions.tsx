@@ -22,7 +22,7 @@ const Transactions = () => {
         }) as Transaction[];
     }
 
-    return <TransactionsTable title={'Transactions, last 24hrs'} transactions={data} hideMerchantCol />;
+    return <TransactionsTable title={'Transactions'} transactions={data} hideMerchantCol />;
 };
 
 export default Transactions;

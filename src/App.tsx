@@ -9,12 +9,14 @@ import NotFound from '@/pages/errors/NotFound.tsx';
 import ConfirmPin from '@/pages/auth/ConfirmPin.tsx';
 import MpesaFloatPurchase from '@/pages/mpesa-float/MpesaFloatPurchase.tsx';
 import VoucherTopUp from '@/pages/voucher-top-up/VoucherTopUp.tsx';
+import Onboarding from '@/pages/auth/Onboarding/Onboarding.tsx';
 
 function App() {
     return (
         <Routes>
             <Route element={<GuestLayout />}>
                 <Route path={'/login'} element={<Middleware.Guest component={<Login />} />} />
+                <Route path={'/onboarding'} element={<Middleware.Guest component={<Onboarding />} />} />
                 <Route path={'/otp'} element={<Middleware.Guest component={<OTP />} />} />
                 <Route path={'/pin-confirmation'} element={<Middleware.Idle component={<ConfirmPin />} />} />
             </Route>

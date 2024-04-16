@@ -112,6 +112,8 @@ export const currencyFormat = (number?: number, currency = 'KES', decimals = 2):
 export const getAuthToken = async () => {
     let token = JSON.parse(String(localStorage.getItem('token')));
 
+    if (!token) token = await authApi.authenticateService();
+
     const expiresAt = moment.unix(decodeJWT(token).exp);
 
     if (moment().add(3, 'm').isAfter(expiresAt)) {
