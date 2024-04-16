@@ -28,7 +28,7 @@ const StagePhone = ({ setStage, setAccount }: StagePhoneProps) => {
     const navigate = useNavigate();
 
     const [getAccountByPhone, { isLoading }] = useLazyGetAccountByPhoneQuery();
-    const [getMerchantByAccount] = useLazyGetMerchantByAccountQuery();
+    const [getMerchantByAccount, { isLoading: isLoadingMerchant }] = useLazyGetMerchantByAccountQuery();
     const [generateOtp] = useGenerateOTPMutation();
 
     const form = useForm<Request>({
@@ -102,8 +102,8 @@ const StagePhone = ({ setStage, setAccount }: StagePhoneProps) => {
                         <SubmitButton
                             className={'w-full'}
                             text={'Verify'}
-                            isLoading={isLoading}
-                            disabled={isLoading || !form.formState.isValid}
+                            isLoading={isLoading || isLoadingMerchant}
+                            disabled={isLoading || isLoadingMerchant || !form.formState.isValid}
                             icon={FaCheck}
                         />
                         <small>
