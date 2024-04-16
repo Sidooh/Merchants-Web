@@ -71,7 +71,7 @@ const StageKYC = ({ account }: StageKYCProps) => {
                             control={form.control}
                             name="first_name"
                             render={() => (
-                                <FormItem>
+                                <FormItem className={'col-span-2 lg:col-span-1'}>
                                     <FormControl>
                                         <Input placeholder="Enter first name" {...form.register('first_name')} />
                                     </FormControl>
@@ -83,7 +83,7 @@ const StageKYC = ({ account }: StageKYCProps) => {
                             control={form.control}
                             name="last_name"
                             render={() => (
-                                <FormItem>
+                                <FormItem className={'col-span-2 lg:col-span-1'}>
                                     <FormControl>
                                         <Input placeholder="Enter last name" {...form.register('last_name')} />
                                     </FormControl>
@@ -111,7 +111,7 @@ const StageKYC = ({ account }: StageKYCProps) => {
                             control={form.control}
                             name="business_name"
                             render={() => (
-                                <FormItem>
+                                <FormItem className={'col-span-2 lg:col-span-1'}>
                                     <FormControl>
                                         <Input placeholder="Enter business name" {...form.register('business_name')} />
                                     </FormControl>
@@ -123,7 +123,7 @@ const StageKYC = ({ account }: StageKYCProps) => {
                             control={form.control}
                             name="landmark"
                             render={() => (
-                                <FormItem>
+                                <FormItem className={'col-span-2 lg:col-span-1'}>
                                     <FormControl>
                                         <Input placeholder="Enter landmark" {...form.register('landmark')} />
                                     </FormControl>
