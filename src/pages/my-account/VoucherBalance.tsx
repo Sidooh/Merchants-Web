@@ -1,17 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx';
-import { useGetVouchersQuery } from '@/services/payments/voucherEndpoints.ts';
 import { useAuth } from '@/hooks/useAuth.ts';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import CountUp from 'react-countup';
-import { VoucherType } from '@/lib/enums.ts';
 import { RiCoupon2Fill } from 'react-icons/ri';
+import { useGetFloatAccountQuery } from '@/services/payments/floatEndpoints.ts';
 
 const VoucherBalance = () => {
     const { user } = useAuth();
 
-    const { data: voucher, isLoading } = useGetVouchersQuery({ account_id: user!.account_id });
+    const { data: floatAccount, isLoading } = useGetFloatAccountQuery(user!.account_id);
 
-    if (!voucher || isLoading) return <Skeleton className={'h-32'} />;
+    if (!floatAccount || isLoading) return <Skeleton className={'h-32'} />;
 
     return (
         <Card>
@@ -20,7 +19,7 @@ const VoucherBalance = () => {
                 <RiCoupon2Fill />
             </CardHeader>
             <CardContent className="text-xl font-bold">
-                <CountUp end={voucher.find((v) => v.type === VoucherType.SIDOOH)!.balance} prefix={'KSH '} />
+                <CountUp end={floatAccount.balance} prefix={'KSH '} />
             </CardContent>
         </Card>
     );
