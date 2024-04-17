@@ -28,7 +28,7 @@ const CashbackBalance = () => {
     if (!earningAccounts || isLoading) return <Skeleton className={'h-80 lg:h-32 lg:col-span-3'} />;
 
     return (
-        <Card className="grid grid-cols-1 md:grid-cols-3 divide-x">
+        <Card className="grid grid-cols-1 md:grid-cols-3 divide-y lg:divide-x">
             <div>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-muted-foreground">Saved Cashback</CardTitle>
