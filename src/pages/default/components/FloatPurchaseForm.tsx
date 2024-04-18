@@ -33,7 +33,7 @@ const formSchema = yup.object({
     merchant_id: yup.number().integer().required(),
     agent: yup.string().required('Agent number is required.'),
     store: yup.string().required('Store number is required.'),
-    amount: yup.number().typeError('Please enter amount').required('Amount is required.'),
+    amount: yup.number().min(10).max(250000).typeError('Please enter amount').required('Amount is required.'),
     method: yup
         .string()
         .oneOf(Object.values(PaymentMethod), 'Method must be MPESA or VOUCHER')
