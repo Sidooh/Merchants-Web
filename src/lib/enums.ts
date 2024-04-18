@@ -18,6 +18,7 @@ export enum PaymentMethod {
 export enum MerchantProduct {
     MPESA_FLOAT = 'MPESA_FLOAT',
     FLOAT_PURCHASE = 'FLOAT_PURCHASE',
+    EARNINGS_WITHDRAW = 'EARNINGS_WITHDRAW',
 }
 
 export enum MerchantType {
@@ -45,4 +46,15 @@ export enum SavingsEarningAccountType {
     MERCHANT = 'MERCHANT',
     MERCHANT_CASHBACK = 'MERCHANT_CASHBACK',
     MERCHANT_COMMISSION = 'MERCHANT_COMMISSION',
+}
+
+export enum EarningsWithdrawalSource {
+    CASHBACK = 'CASHBACK',
+    COMMISSION = 'COMMISSION',
+    VOUCHER = 'VOUCHER',
+}
+
+export enum EarningsWithdrawalDestination {
+    MPESA = 'MPESA',
+    VOUCHER = 'VOUCHER',
 }

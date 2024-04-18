@@ -1,5 +1,5 @@
 import VoucherBalance from '@/pages/my-account/VoucherBalance.tsx';
-import CashbackBalance from '@/pages/my-account/CashbackBalance.tsx';
+import MerchantEarningBalances from '@/pages/my-account/MerchantEarningBalances.tsx';
 import SavingsAndInterestBalances from '@/pages/my-account/SavingsAndInterestBalances.tsx';
 
 const MyAccount = () => {
@@ -12,7 +12,7 @@ const MyAccount = () => {
                 </div>
                 <div className="grid gap-3 grid-cols-1 lg:grid-cols-3">
                     <VoucherBalance />
-                    <CashbackBalance />
+                    <MerchantEarningBalances />
                 </div>
             </div>
 

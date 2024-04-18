@@ -18,34 +18,16 @@ export const paymentsApi = createApi({
         },
     }),
     endpoints: (build) => ({
-        getBuyGoodsCharges: build.query<Charge[], void>({
-            query: () => '/charges/buy-goods',
+        getCharges: build.query<Charge[], { endpoint: string; tagType: any }>({
+            query: ({ endpoint }) => `/charges/${endpoint}`,
             transformResponse: (val: ApiResponse<Charge[]>) => val.data,
-            providesTags: (result) =>
+            providesTags: (result, _, { tagType }) =>
                 providesList(
                     result?.map((r, i) => ({ ...r, id: i })),
-                    'BuyGoodsCharge'
-                ),
-        }),
-        getFloatCharges: build.query<Charge[], void>({
-            query: () => '/charges/mpesa-float',
-            transformResponse: (val: ApiResponse<Charge[]>) => val.data,
-            providesTags: (result) =>
-                providesList(
-                    result?.map((r, i) => ({ ...r, id: i })),
-                    'FloatCharge'
-                ),
-        }),
-        getPayBillCharges: build.query<Charge[], void>({
-            query: () => '/charges/pay-bill',
-            transformResponse: (val: ApiResponse<Charge[]>) => val.data,
-            providesTags: (result) =>
-                providesList(
-                    result?.map((r, i) => ({ ...r, id: i })),
-                    'PayBillCharge'
+                    tagType
                 ),
         }),
     }),
 });
 
-export const { useGetBuyGoodsChargesQuery, useGetFloatChargesQuery, useGetPayBillChargesQuery } = paymentsApi;
+export const { useGetChargesQuery } = paymentsApi;

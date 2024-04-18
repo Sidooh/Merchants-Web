@@ -8,7 +8,7 @@ import { SavingsEarningAccountType } from '@/lib/enums.ts';
 import { useEffect, useState } from 'react';
 import { SavingsEarningAccount } from '@/lib/types/models.ts';
 
-const CashbackBalance = () => {
+const SavingsAndInterestBalances = () => {
     const { user } = useAuth();
 
     const { data: earningAccounts, isLoading } = useGetEarningAccountsQuery(user!.account_id);
@@ -35,9 +35,9 @@ const CashbackBalance = () => {
                     <FaMoneyBills />
                 </CardHeader>
                 <CardContent className="text-xl font-bold">
-                    <CountUp end={cashbackAccount?.balance!} prefix={'KSH '} />
+                    <CountUp end={cashbackAccount?.balance!} prefix={'KES '} />
                     <p className="text-xs text-muted-foreground">
-                        <CountUp end={cashbackAccount?.interest!} prefix={'+KSH '} suffix={' interest'} />
+                        <CountUp end={cashbackAccount?.interest!} prefix={'+KES '} suffix={' interest'} />
                     </p>
                 </CardContent>
             </div>
@@ -48,9 +48,9 @@ const CashbackBalance = () => {
                     <FaMoneyBills />
                 </CardHeader>
                 <CardContent className="text-xl font-bold">
-                    <CountUp end={commissionAccount?.balance!} prefix={'KSH '} />
+                    <CountUp end={commissionAccount?.balance!} prefix={'KES '} />
                     <p className="text-xs text-muted-foreground">
-                        <CountUp end={commissionAccount?.interest!} prefix={'+KSH '} suffix={' interest'} />
+                        <CountUp end={commissionAccount?.interest!} prefix={'+KES '} suffix={' interest'} />
                     </p>
                 </CardContent>
             </div>
@@ -63,13 +63,13 @@ const CashbackBalance = () => {
                 <CardContent className="text-2xl font-bold">
                     <CountUp
                         end={cashbackAccount?.balance! + commissionAccount?.balance!}
-                        prefix={'KSH '}
+                        prefix={'KES '}
                         className={'text-primary'}
                     />
                     <p className="text-xs text-primary/80">
                         <CountUp
                             end={commissionAccount?.interest! + commissionAccount?.interest!}
-                            prefix={'+KSH '}
+                            prefix={'+KES '}
                             suffix={' interest'}
                         />
                     </p>
@@ -79,4 +79,4 @@ const CashbackBalance = () => {
     );
 };
 
-export default CashbackBalance;
+export default SavingsAndInterestBalances;

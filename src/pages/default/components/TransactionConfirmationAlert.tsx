@@ -13,14 +13,11 @@ import { Separator } from '@/components/ui/separator.tsx';
 import { MerchantProduct } from '@/lib/enums.ts';
 import { currencyFormat } from '@/lib/utils.ts';
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
-import {
-    useGetBuyGoodsChargesQuery,
-    useGetFloatChargesQuery,
-    useGetPayBillChargesQuery,
-} from '@/services/payments/paymentsApi.ts';
+import { useGetChargesQuery } from '@/services/payments/paymentsApi.ts';
+import { EarningsWithdrawalRequest } from '@/lib/types/requests.ts';
 
 type TransactionConfirmationAlertProps = {
-    values: MpesaFloatPurchaseRequest | VoucherPurchaseRequest;
+    values: MpesaFloatPurchaseRequest | VoucherPurchaseRequest | EarningsWithdrawalRequest;
     open: boolean;
     setOpen: Dispatch<SetStateAction<boolean>>;
     onConfirmed: () => void;
@@ -36,27 +33,36 @@ const TransactionConfirmationAlert = ({
     product,
     children,
 }: TransactionConfirmationAlertProps) => {
-    const { data: buyGoodsCharges, isLoading: isLoadingBuyGoods } = useGetBuyGoodsChargesQuery(undefined, {
-        skip: product === MerchantProduct.MPESA_FLOAT || !values.amount || values.amount >= 11000,
-    });
-    const { data: payBillCharges, isLoading: isLoadingPayBill } = useGetPayBillChargesQuery(undefined, {
-        skip: product === MerchantProduct.MPESA_FLOAT || !values.amount || values.amount < 11000,
-    });
-    const { data: floatCharges, isLoading: isLoadingFloat } = useGetFloatChargesQuery(undefined, {
-        skip: product === MerchantProduct.FLOAT_PURCHASE,
-    });
+    let endpoint: string | undefined = undefined,
+        tagType: string | undefined = undefined;
+
+    if (product === MerchantProduct.EARNINGS_WITHDRAW) {
+        endpoint = 'withdrawal';
+        tagType = 'WithdrawalCharge';
+    }
+    if (product === MerchantProduct.FLOAT_PURCHASE && values.amount < 11000) {
+        endpoint = `buy-goods`;
+        tagType = 'BuyGoodsCharge';
+    }
+    if (product === MerchantProduct.FLOAT_PURCHASE && values.amount >= 11000) {
+        endpoint = `pay-bill`;
+        tagType = 'PayBillCharge';
+    }
+    if (product === MerchantProduct.MPESA_FLOAT) {
+        endpoint = `mpesa-float`;
+        tagType = 'FloatCharge';
+    }
+
+    const { data: charges, isLoading: isLoading } = useGetChargesQuery(
+        { endpoint: endpoint!, tagType },
+        { skip: !endpoint || !tagType }
+    );
 
     const [charge, setCharge] = useState<Charge>();
 
     useEffect(() => {
-        let charges: Charge[] = [];
-
-        if (buyGoodsCharges) charges = buyGoodsCharges;
-        if (payBillCharges) charges = payBillCharges;
-        if (floatCharges) charges = floatCharges;
-
-        setCharge(charges.find((c) => c.min <= values.amount && values.amount <= c.max));
-    }, [buyGoodsCharges, floatCharges, payBillCharges, values.amount]);
+        setCharge(charges?.find((c) => c.min <= values.amount && values.amount <= c.max));
+    }, [charges, values.amount]);
 
     return (
         <AlertDialog open={open} onOpenChange={setOpen}>
@@ -71,7 +77,7 @@ const TransactionConfirmationAlert = ({
 
                         <div>
                             <p className="text-sm ">{currencyFormat(values.amount)}</p>
-                            {isLoadingPayBill || isLoadingBuyGoods || isLoadingFloat ? (
+                            {isLoading ? (
                                 <div className={'h-3 w-1/3 bg-slate-200 rounded'} />
                             ) : (
                                 <p className={'text-[7pt] text-muted-foreground font-medium'}>

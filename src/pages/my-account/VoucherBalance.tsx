@@ -19,7 +19,7 @@ const VoucherBalance = () => {
                 <RiCoupon2Fill />
             </CardHeader>
             <CardContent className="text-xl font-bold">
-                <CountUp end={floatAccount.balance} prefix={'KSH '} />
+                <CountUp end={floatAccount.balance} prefix={'KES '} />
             </CardContent>
         </Card>
     );

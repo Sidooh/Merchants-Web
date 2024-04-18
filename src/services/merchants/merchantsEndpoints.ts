@@ -5,12 +5,14 @@ import {
     MpesaFloatPurchaseRequest,
     MpesaFloatPurchaseResponse,
     MpesaStore,
+    Transaction,
     UpdateKybRequest,
     VoucherPurchaseRequest,
     VoucherPurchaseResponse,
 } from '@/lib/types.ts';
 import { merchantsApi } from '@/services/merchants/merchantsApi.ts';
 import { providesList } from '@/lib/utils.ts';
+import { EarningsWithdrawalRequest } from '@/lib/types/requests.ts';
 
 const merchantsEndpoints = merchantsApi.injectEndpoints({
     endpoints: (build) => ({
@@ -48,8 +50,20 @@ const merchantsEndpoints = merchantsApi.injectEndpoints({
                 method: 'POST',
                 body,
             }),
-            transformResponse: (val: ApiResponse<MpesaFloatPurchaseResponse>) => val.data,
+            transformResponse: (val: ApiResponse<VoucherPurchaseResponse>) => val.data,
             invalidatesTags: [{ type: 'Transaction', id: 'LIST' }],
+        }),
+        withdrawEarnings: build.mutation<Transaction, EarningsWithdrawalRequest>({
+            query: ({ merchant_id, ...body }) => ({
+                url: `/merchants/${merchant_id}/earnings/withdraw`,
+                method: 'POST',
+                body,
+            }),
+            transformResponse: (val: ApiResponse<Transaction>) => val.data,
+            invalidatesTags: [
+                { type: 'EarningAccount', id: 'LIST' },
+                { type: 'Transaction', id: 'LIST' },
+            ],
         }),
 
         getMerchantByAccount: build.query<Merchant, number>({
@@ -66,10 +80,11 @@ const merchantsEndpoints = merchantsApi.injectEndpoints({
 });
 
 export const {
+    useBuyMpesaFloatMutation,
     useCreateMerchantMutation,
-    useUpdateKybMutation,
     useGetMpesaStoresQuery,
     useLazyGetMerchantByAccountQuery,
-    useBuyMpesaFloatMutation,
     useTopUpFloatMutation,
+    useUpdateKybMutation,
+    useWithdrawEarningsMutation,
 } = merchantsEndpoints;
