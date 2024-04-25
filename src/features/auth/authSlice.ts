@@ -1,6 +1,7 @@
 import { createAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { authApi } from './authApi';
 import { LoginRequest } from '@/lib/types.ts';
+import secureLocalStorage from 'react-secure-storage';
 
 export type AuthState = {
     isError: boolean;
@@ -13,6 +14,7 @@ export type AuthState = {
         is_idle?: boolean;
         business_name: string;
         has_otp?: boolean;
+        is_whitelisted: boolean;
         merchant_id: number;
         name: string;
         phone: number;
@@ -26,7 +28,7 @@ const initialState: AuthState = {
     isLoading: false,
     isSuccess: false,
     message: '',
-    user: JSON.parse(String(localStorage.getItem('user'))),
+    user: JSON.parse(String(secureLocalStorage.getItem('user'))),
 };
 
 export const login = createAsyncThunk('auth/login', async (user: LoginRequest, thunkAPI) => {
@@ -40,6 +42,7 @@ export const login = createAsyncThunk('auth/login', async (user: LoginRequest, t
 export const logout = createAction('auth/logout');
 
 export const idle = createAction<boolean>('auth/idle');
+export const whitelisted = createAction<boolean>('auth/whitelisted');
 export const hasOtp = createAction<boolean>('auth/has_otp');
 
 export const authSlice = createSlice({
@@ -71,28 +74,38 @@ export const authSlice = createSlice({
             })
 
             .addCase(logout, (state) => {
-                localStorage.removeItem('user');
-                localStorage.removeItem('token');
+                secureLocalStorage.removeItem('user');
+                secureLocalStorage.removeItem('token');
 
                 state.user = undefined;
             })
 
             .addCase(hasOtp, (state, action) => {
-                const user: AuthState['user'] = JSON.parse(String(localStorage.getItem('user')));
+                const user: AuthState['user'] = JSON.parse(String(secureLocalStorage.getItem('user')));
 
                 if (user) user['has_otp'] = action.payload;
 
-                localStorage.setItem('user', JSON.stringify(user));
+                secureLocalStorage.setItem('user', JSON.stringify(user));
+
+                state.user = user;
+            })
+
+            .addCase(whitelisted, (state, action) => {
+                const user: AuthState['user'] = JSON.parse(String(secureLocalStorage.getItem('user')));
+
+                if (user) user['is_whitelisted'] = action.payload;
+
+                secureLocalStorage.setItem('user', JSON.stringify(user));
 
                 state.user = user;
             })
 
             .addCase(idle, (state, action) => {
-                const user: AuthState['user'] = JSON.parse(String(localStorage.getItem('user')));
+                const user: AuthState['user'] = JSON.parse(String(secureLocalStorage.getItem('user')));
 
                 if (user) user['is_idle'] = action.payload;
 
-                localStorage.setItem('user', JSON.stringify(user));
+                secureLocalStorage.setItem('user', JSON.stringify(user));
 
                 state.user = user;
             });

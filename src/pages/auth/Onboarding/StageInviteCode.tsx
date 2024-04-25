@@ -5,21 +5,18 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card.tsx';
 import { Input } from '@/components/ui/input.tsx';
-import { Dispatch, SetStateAction } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CONFIG } from '@/config.ts';
 import { AiOutlineLogin } from 'react-icons/ai';
-import { OnboardingStage } from '@/lib/enums.ts';
 import { useCreateAccountMutation } from '@/services/accounts/accountsEndpoints.ts';
+import secureLocalStorage from 'react-secure-storage';
 
 type Request = { invite_code: string };
 
-type StageInviteCodeProps = {
-    phone: string;
-    setStage: Dispatch<SetStateAction<OnboardingStage>>;
-};
+const StageInviteCode = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
 
-const StageInviteCode = ({ setStage, phone }: StageInviteCodeProps) => {
     const [createAccount, { isLoading }] = useCreateAccountMutation();
 
     const form = useForm<Request>({
@@ -32,9 +29,10 @@ const StageInviteCode = ({ setStage, phone }: StageInviteCodeProps) => {
     });
 
     const handleSubmit: SubmitHandler<Request> = async (values) => {
-        await createAccount({ phone, invite_code: values.invite_code }).unwrap();
+        const account = await createAccount({ phone: location.state.phone, invite_code: values.invite_code }).unwrap();
 
-        setStage(OnboardingStage.KYC);
+        secureLocalStorage.setItem('acc', account.id);
+        navigate('/onboarding/kyc');
     };
 
     return (

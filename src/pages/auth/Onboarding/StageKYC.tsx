@@ -7,14 +7,13 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Input } from '@/components/ui/input.tsx';
 import { AiOutlineLogin } from 'react-icons/ai';
 import { CONFIG } from '@/config.ts';
-import { Account, CreateMerchantRequest, UpdateKybRequest } from '@/lib/types.ts';
+import { CreateMerchantRequest, UpdateKybRequest } from '@/lib/types.ts';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/lib/utils.ts';
 import { useCreateMerchantMutation, useUpdateKybMutation } from '@/services/merchants/merchantsEndpoints.ts';
-
-type StageKYCProps = {
-    account: Account;
-};
+import { useEffect } from 'react';
+import secureLocalStorage from 'react-secure-storage';
+import AlertError from '@/components/errors/AlertError.tsx';
 
 const formSchema = yup.object({
     account_id: yup.number().integer().required(),
@@ -25,36 +24,44 @@ const formSchema = yup.object({
     landmark: yup.string().max(20).required('Land mark is required.'),
 });
 
-const StageKYC = ({ account }: StageKYCProps) => {
+const StageKYC = () => {
     const navigate = useNavigate();
 
-    const [createMerchant, { isLoading: createLoading }] = useCreateMerchantMutation();
-    const [updateKyb, { isLoading: updateLoading }] = useUpdateKybMutation();
+    const [createMerchant, { isLoading: createLoading, error: createError }] = useCreateMerchantMutation();
+    const [updateKyb, { isLoading: updateLoading, error: updateError }] = useUpdateKybMutation();
 
     const form = useForm<CreateMerchantRequest & UpdateKybRequest>({
         mode: 'onBlur',
         resolver: yupResolver(formSchema),
-        defaultValues: {
-            account_id: account.id,
-            first_name: '',
-        },
     });
 
     const handleSubmit: SubmitHandler<CreateMerchantRequest & UpdateKybRequest> = async (values) => {
         const merchant = await createMerchant({ ...values, id_number: String(values.id_number) }).unwrap();
         await updateKyb({ ...values, merchant_id: merchant.id }).unwrap();
 
-        navigate('/login');
+        navigate('/waitlist');
 
-        toast({
+        /*toast({
             title: 'Onboarding Successful!',
             text: 'We have sent you an SMS with your new Sidooh store number. Use it to sign in.',
             toast: false,
             showConfirmButton: true,
             timer: undefined,
             position: 'center',
-        });
+        });*/
+
+        toast({ titleText: 'Onboarding Successful!' });
+
+        secureLocalStorage.removeItem('acc');
     };
+
+    useEffect(() => {
+        const id = secureLocalStorage.getItem('acc');
+
+        if (!id) navigate('/onboarding/phone');
+
+        form.setValue('account_id', Number(id));
+    }, []);
 
     return (
         <Card className={'p-5 h-full lg:max-w-3xl lg:min-w-[35rem] relative shadow-xl border-0'}>
@@ -65,6 +72,7 @@ const StageKYC = ({ account }: StageKYCProps) => {
                 </CardTitle>
             </CardHeader>
             <CardContent>
+                <AlertError error={createError || updateError} className={'mt-4'} />
                 <Form {...form}>
                     <form className="grid grid-cols-2 gap-3" onSubmit={form.handleSubmit(handleSubmit)}>
                         <FormField

@@ -7,16 +7,13 @@ export const Middleware = {
         const { user } = useAuth();
         const location = useLocation();
 
-        if (user?.has_otp) {
+        if (user?.has_otp && user.is_whitelisted) {
             const urlIntended: string = location.state?.from?.pathname || '/';
 
             return <Navigate to={urlIntended} replace />;
         }
 
-        if (user) {
-            if (location.pathname !== '/otp') return <Navigate to={'/otp'} replace />;
-            if (user.is_idle) return <Navigate to="/pin-confirmation" replace />;
-        }
+        if (user?.is_idle) return <Navigate to="/pin-confirmation" replace />;
 
         return component;
     },
@@ -36,6 +33,7 @@ export const Middleware = {
 
         if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
         if (!user.has_otp) return <Navigate to="/otp" state={{ from: location }} replace />;
+        if (!user.is_whitelisted) return <Navigate to="/waitlist" replace />;
         if (user.is_idle) return <Navigate to="/pin-confirmation" state={{ from: location }} replace />;
 
         return component;

@@ -9,16 +9,24 @@ import NotFound from '@/pages/errors/NotFound.tsx';
 import ConfirmPin from '@/pages/auth/ConfirmPin.tsx';
 import MpesaFloatPurchase from '@/pages/mpesa-float/MpesaFloatPurchase.tsx';
 import VoucherTopUp from '@/pages/voucher-top-up/VoucherTopUp.tsx';
-import Onboarding from '@/pages/auth/Onboarding/Onboarding.tsx';
 import MyAccount from '@/pages/my-account/MyAccount.tsx';
+import Waitlist from '@/pages/auth/Waitlist.tsx';
+import StagePhone from '@/pages/auth/Onboarding/StagePhone.tsx';
+import StageKYC from '@/pages/auth/Onboarding/StageKYC.tsx';
+import StageInviteCode from '@/pages/auth/Onboarding/StageInviteCode.tsx';
 
 function App() {
     return (
         <Routes>
             <Route element={<GuestLayout />}>
                 <Route path={'/login'} element={<Middleware.Guest component={<Login />} />} />
-                <Route path={'/onboarding'} element={<Middleware.Guest component={<Onboarding />} />} />
+
+                <Route path={'/onboarding/phone'} element={<Middleware.Guest component={<StagePhone />} />} />
+                <Route path={'/onboarding/invite'} element={<Middleware.Guest component={<StageInviteCode />} />} />
+                <Route path={'/onboarding/kyc'} element={<Middleware.Guest component={<StageKYC />} />} />
+
                 <Route path={'/otp'} element={<Middleware.Guest component={<OTP />} />} />
+                <Route path={'/waitlist'} element={<Middleware.Guest component={<Waitlist />} />} />
                 <Route path={'/pin-confirmation'} element={<Middleware.Idle component={<ConfirmPin />} />} />
             </Route>
 

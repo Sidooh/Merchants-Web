@@ -21,3 +21,8 @@ export type SavingsEarningAccount = Model & {
     status: Status;
     account_id: number;
 };
+
+export type USSDSetting = Model & {
+    name: string;
+    value: string;
+};

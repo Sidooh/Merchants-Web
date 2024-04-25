@@ -1,7 +1,9 @@
 import { CONFIG } from '@/config';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { Account, ApiResponse, LoginRequest, LoginResponse, Merchant } from '@/lib/types';
 import { AuthState } from '@/features/auth/authSlice.ts';
+import { USSDSetting } from '@/lib/types/models.ts';
+import secureLocalStorage from 'react-secure-storage';
 
 export const authApi = {
     authenticateService: async (): Promise<string | undefined> => {
@@ -15,7 +17,7 @@ export const authApi = {
 
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-            localStorage.setItem('token', JSON.stringify(token));
+            secureLocalStorage.setItem('token', JSON.stringify(token));
 
             return token;
         } catch (e: unknown) {
@@ -55,6 +57,10 @@ export const authApi = {
 
             if (merchant?.code !== data.store_no) throw new Error('Invalid credentials!');
 
+            const { data: ussdSettings } = await axios.get<any, AxiosResponse<USSDSetting[]>>(
+                `${CONFIG.services.ussd.api.url}/settings`
+            );
+
             const user: AuthState['user'] = {
                 account_id: account.id,
                 business_name: merchant.business_name,
@@ -63,9 +69,15 @@ export const authApi = {
                 phone: account.phone,
                 store_no: merchant.code,
                 float_account_id: merchant.float_account_id,
+                is_whitelisted: Boolean(
+                    ussdSettings
+                        .find((s: USSDSetting) => s.name === 'MERCHANT_BETA_ACCOUNTS')
+                        ?.value.split(',')
+                        .includes(String(account.id))
+                ),
             };
 
-            localStorage.setItem('user', JSON.stringify(user));
+            secureLocalStorage.setItem('user', JSON.stringify(user));
 
             return user;
         } catch (err: unknown) {

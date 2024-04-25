@@ -6,6 +6,9 @@ interface ImportMetaEnv {
     readonly VITE_MERCHANTS_API_URL: string;
     readonly VITE_PAYMENTS_API_URL: string;
     readonly VITE_SAVINGS_API_URL: string;
+    readonly VITE_USSD_API_URL: string;
+
+    readonly VITE_OTP_RESEND_TIMEOUT: number;
 }
 
 interface ImportMeta {

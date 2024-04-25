@@ -34,7 +34,7 @@ const OTP = () => {
 
     const [phone, setPhone] = useState(location.state?.phone || user?.phone);
     const [error, setError] = useState('');
-    const [timer, setTimer] = useState(60);
+    const [timer, setTimer] = useState(CONFIG.app.otp_resend_timeout);
 
     const form = useForm<yup.InferType<typeof formSchema>>({
         resolver: yupResolver(formSchema),
@@ -85,7 +85,7 @@ const OTP = () => {
         if (timer === 0) {
             form.reset();
 
-            setTimer(60);
+            setTimer(CONFIG.app.otp_resend_timeout);
 
             generateOtp({ phone });
         }

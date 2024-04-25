@@ -16,7 +16,9 @@ const AlertError = forwardRef<HTMLDivElement, ServerErrorProps>(({ error, classN
         if (error) {
             if (isFetchBaseQueryError(error)) {
                 if ('data' in error) {
-                    if ('message' in (error.data as object)) {
+                    if (typeof error.data === 'string') {
+                        setMessage(error.data);
+                    } else if ('message' in (error.data as object)) {
                         setMessage((error as { data: { message: string } }).data.message);
                     }
                 }
