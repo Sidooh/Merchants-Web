@@ -41,7 +41,9 @@ const Login = () => {
     const handleSubmit: SubmitHandler<LoginRequest> = async (values) => {
         const acc = await dispatch(login(values)).unwrap();
 
-        if (acc?.account_id) {
+        if (!acc.is_whitelisted) {
+            navigate('/waitlist');
+        } else if (acc?.account_id) {
             generateOtp({ phone: form.getValues('phone') });
         }
     };
@@ -100,12 +102,13 @@ const Login = () => {
                             className={'w-full'}
                             text={'Sign In'}
                             isLoading={isLoading}
+                            loadingText={'Signing In...'}
                             disabled={isLoading || !form.formState.isValid}
                             icon={AiOutlineLogin}
                         />
                         <small>
                             Haven't onboarded yet?{' '}
-                            <Link to={'/onboarding'} className={'font-semibold text-primary underline'}>
+                            <Link to={'/onboarding/phone'} className={'font-semibold text-primary underline'}>
                                 Onboard
                             </Link>
                         </small>

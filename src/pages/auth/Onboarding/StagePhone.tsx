@@ -11,20 +11,13 @@ import { CONFIG } from '@/config.ts';
 import { FaCheck } from 'react-icons/fa6';
 import { useLazyGetAccountByPhoneQuery } from '@/services/accounts/accountsEndpoints.ts';
 import { useGenerateOTPMutation } from '@/services/accounts/authEndpoints.ts';
-import { OnboardingStage } from '@/lib/enums.ts';
-import { Dispatch, SetStateAction } from 'react';
-import { Account } from '@/lib/types.ts';
 import { useLazyGetMerchantByAccountQuery } from '@/services/merchants/merchantsEndpoints.ts';
 import { toast } from '@/lib/utils.ts';
+import secureLocalStorage from 'react-secure-storage';
 
 type Request = { phone: string };
 
-type StagePhoneProps = {
-    setStage: Dispatch<SetStateAction<OnboardingStage>>;
-    setAccount: Dispatch<SetStateAction<Account | undefined>>;
-};
-
-const StagePhone = ({ setStage, setAccount }: StagePhoneProps) => {
+const StagePhone = () => {
     const navigate = useNavigate();
 
     const [getAccountByPhone, { isLoading }] = useLazyGetAccountByPhoneQuery();
@@ -60,14 +53,18 @@ const StagePhone = ({ setStage, setAccount }: StagePhoneProps) => {
                         navigate('/login');
                     })
                     .catch((err) => {
-                        if (err.status === 404) setAccount(acc);
+                        if (err.status === 404) {
+                            secureLocalStorage.setItem('acc', acc.id);
+                            navigate('/onboarding/kyc');
+                        }
                     });
             })
             .catch((err) => {
                 if (err.status === 404) {
                     generateOtp(values);
-                    navigate('/otp', { state: { phone: values.phone, next: '/onboarding' } });
-                    setStage(OnboardingStage.INVITE_CODE);
+                    navigate('/otp', {
+                        state: { phone: values.phone, next: '/onboarding/invite' },
+                    });
                 }
             });
     };

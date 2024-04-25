@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useEffect, useState } from 'react';
+import secureLocalStorage from 'react-secure-storage';
 
 type Theme = 'dark' | 'light' | 'system';
 
@@ -46,7 +47,7 @@ export function ThemeProvider({
     const value = {
         theme,
         setTheme: (theme: Theme) => {
-            localStorage.setItem(storageKey, theme);
+            secureLocalStorage.setItem(storageKey, theme);
             setTheme(theme);
         },
     };
