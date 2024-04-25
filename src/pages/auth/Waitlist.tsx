@@ -28,6 +28,7 @@ const Waitlist = () => {
 
             if (betaAccounts?.includes(String(user?.account_id))) {
                 dispatch(whitelisted(true));
+
                 navigate('/');
             }
 
