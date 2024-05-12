@@ -251,7 +251,7 @@ const WithdrawalFormDialog = ({ source, open, setOpen }: WithdrawalFormDialogPro
                 onConfirmed={handleTransactionConfirmed}
             >
                 <div className="space-y-1">
-                    <h4 className="text-xs text-muted-foreground font-medium leading-none">From</h4>
+                    <h4 className="text-xs text-muted-foreground font-medium leading-none">Withdrawal From</h4>
                     <p className="text-sm ">{form.getValues('source')}</p>
                 </div>
                 <Separator className="my-4" />

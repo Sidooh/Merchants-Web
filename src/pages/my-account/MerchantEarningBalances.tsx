@@ -2,17 +2,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.t
 import { useAuth } from '@/hooks/useAuth.ts';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import CountUp from 'react-countup';
-import { FaCoins } from 'react-icons/fa6';
 import { useGetMerchantEarningAccountsQuery } from '@/services/merchants/earningAccountEndpoints.ts';
 import { Str } from '@/lib/utils.ts';
 import { MerchantEarningAccount } from '@/lib/types/models.ts';
-import { MerchantEarningAccountType } from '@/lib/enums.ts';
-import { useEffect, useState } from 'react';
-import CashbackBalance from '@/pages/my-account/CashbackBalance.tsx';
+import { EarningsWithdrawalSource } from '@/lib/enums.ts';
+import { useState } from 'react';
+import { GiReceiveMoney } from 'react-icons/gi';
+import { Button } from '@/components/ui/button.tsx';
+import { BiMoneyWithdraw } from 'react-icons/bi';
+import WithdrawalFormDialog from '@/pages/my-account/WithdrawalFormDialog.tsx';
 
 type BalanceProps = { earningAccount?: MerchantEarningAccount; isLoading: boolean };
 
-const CommissionBalance = ({ earningAccount, isLoading }: BalanceProps) => {
+const Balance = ({ earningAccount, isLoading }: BalanceProps) => {
+    const [openWithdrawalForm, setOpenWithdrawalForm] = useState(false);
+
     if (isLoading) return <Skeleton className={'h-32'} />;
     if (!earningAccount) return <></>;
 
@@ -22,11 +26,25 @@ const CommissionBalance = ({ earningAccount, isLoading }: BalanceProps) => {
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                     {Str.headline(String(earningAccount.type))}
                 </CardTitle>
-                <FaCoins />
+                <GiReceiveMoney />
             </CardHeader>
-            <CardContent className="text-xl font-bold">
+            <CardContent className="text-xl font-bold flex justify-between gap-2 items-center">
                 <CountUp end={earningAccount.amount} prefix={'KES '} />
+                <Button
+                    size={'sm'}
+                    variant={'secondary'}
+                    className={'text-red-700'}
+                    onClick={() => setOpenWithdrawalForm(true)}
+                >
+                    Withdraw <BiMoneyWithdraw className="ms-2" />
+                </Button>
             </CardContent>
+
+            <WithdrawalFormDialog
+                open={openWithdrawalForm}
+                setOpen={setOpenWithdrawalForm}
+                source={earningAccount.type as unknown as EarningsWithdrawalSource}
+            />
         </Card>
     );
 };
@@ -36,24 +54,7 @@ const MerchantEarningBalances = () => {
 
     const { data: earningAccounts, isLoading } = useGetMerchantEarningAccountsQuery({ merchant_id: user!.merchant_id });
 
-    const [cashback, setCashback] = useState<MerchantEarningAccount>();
-    const [commission, setCommission] = useState<MerchantEarningAccount>();
-
-    useEffect(() => {
-        if (earningAccounts?.length) {
-            earningAccounts.forEach((a) => {
-                if (a.type === MerchantEarningAccountType.CASHBACK) setCashback(a);
-                if (a.type === MerchantEarningAccountType.COMMISSION) setCommission(a);
-            });
-        }
-    }, [earningAccounts]);
-
-    return (
-        <>
-            <CashbackBalance earningAccount={cashback} isLoading={isLoading} />
-            <CommissionBalance earningAccount={commission} isLoading={isLoading} />
-        </>
-    );
+    return <>{earningAccounts?.map((a) => <Balance key={a.type} earningAccount={a} isLoading={isLoading} />)}</>;
 };
 
 export default MerchantEarningBalances;
