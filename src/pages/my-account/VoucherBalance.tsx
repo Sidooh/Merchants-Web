@@ -10,7 +10,7 @@ const VoucherBalance = () => {
 
     const { data: floatAccount, isLoading } = useGetFloatAccountQuery(user!.account_id);
 
-    if (!floatAccount || isLoading) return <Skeleton className={'h-32'} />;
+    if (!floatAccount || isLoading) return <Skeleton className={'h-32 col-span-3'} />;
 
     return (
         <Card>
