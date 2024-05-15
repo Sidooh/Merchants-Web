@@ -12,8 +12,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import SubmitButton from '@/components/common/SubmitButton.tsx';
 import { useCheckPinMutation } from '@/services/accounts/accountsEndpoints.ts';
 import { useAuth } from '@/hooks/useAuth.ts';
-import { idle } from '@/features/auth/authSlice.ts';
+import { idle, logout } from '@/features/auth/authSlice.ts';
 import { useAppDispatch } from '@/app/store.ts';
+import { Button } from '@/components/ui/button.tsx';
 
 const formSchema = yup.object({
     account_id: yup.number().integer().required(),
@@ -91,14 +92,23 @@ const ConfirmPin = () => {
                             )}
                         />
 
-                        <SubmitButton
-                            className={'w-full'}
-                            disabled={isLoading || !form.formState.isValid}
-                            isLoading={isLoading}
-                            text={'Confirm'}
-                            loadingText={'Confirming...'}
-                            icon={CheckCircledIcon}
-                        />
+                        <div>
+                            <SubmitButton
+                                className={'w-full'}
+                                disabled={isLoading || !form.formState.isValid}
+                                isLoading={isLoading}
+                                text={'Confirm'}
+                                loadingText={'Confirming...'}
+                                icon={CheckCircledIcon}
+                            />
+                            <Button
+                                variant={'link'}
+                                className={'p-0 text-xs text-muted-foreground h-auto'}
+                                onClick={() => dispatch(logout())}
+                            >
+                                Sign Out
+                            </Button>
+                        </div>
                     </form>
                 </Form>
             </CardContent>

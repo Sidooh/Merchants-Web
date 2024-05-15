@@ -75,12 +75,9 @@ const FloatPurchaseForm = () => {
 
     const completePurchaseRequest = (values: MpesaFloatPurchaseRequest) => {
         if (openPinConfirmationForm) setOpenPinConfirmationForm(false);
-
-        values.amount = Number(values.amount);
-
         if (values.method === PaymentMethod.FLOAT) delete values['debit_account'];
 
-        sendPurchaseRequest(values)
+        sendPurchaseRequest(formSchema.cast(values))
             .unwrap()
             .then(() => {
                 toast({ titleText: 'Transaction Initiated Successfully!' });

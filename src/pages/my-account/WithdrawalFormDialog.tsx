@@ -33,7 +33,7 @@ import {
     MerchantProduct,
     PaymentMethod,
 } from '@/lib/enums.ts';
-import { Str } from '@/lib/utils.ts';
+import { Str, toast } from '@/lib/utils.ts';
 import PinConfirmationForm from '@/pages/default/components/PinConfirmationForm.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
 import TransactionConfirmationAlert from '@/pages/default/components/TransactionConfirmationAlert.tsx';
@@ -106,11 +106,18 @@ const WithdrawalFormDialog = ({ source, open, setOpen }: WithdrawalFormDialogPro
     };
 
     const handlePinConfirmed = () => {
-        const values = form.getValues();
+        const values = formSchema.cast(form.getValues());
 
         if (values.destination !== EarningsWithdrawalDestination.MPESA) delete values['account'];
 
-        withdrawEarnings(values).then();
+        withdrawEarnings(values)
+            .unwrap()
+            .then(() => {
+                toast({ titleText: 'Withdrawal Initiated Successfully!' });
+
+                form.reset();
+            })
+            .catch(() => toast({ titleText: 'Something went wrong. Please retry!', icon: 'error' }));
     };
 
     return (

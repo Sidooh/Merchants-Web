@@ -35,9 +35,9 @@ const SavingsAndInterestBalances = () => {
                     <FaMoneyBills />
                 </CardHeader>
                 <CardContent className="text-xl font-bold">
-                    <CountUp end={cashbackAccount?.balance!} prefix={'KES '} />
+                    <CountUp end={cashbackAccount?.balance!} decimals={2} prefix={'KES '} />
                     <p className="text-xs text-muted-foreground">
-                        <CountUp end={cashbackAccount?.interest!} prefix={'+KES '} suffix={' interest'} />
+                        <CountUp end={cashbackAccount?.interest!} decimals={4} prefix={'+KES '} suffix={' interest'} />
                     </p>
                 </CardContent>
             </div>
@@ -48,9 +48,14 @@ const SavingsAndInterestBalances = () => {
                     <FaMoneyBills />
                 </CardHeader>
                 <CardContent className="text-xl font-bold">
-                    <CountUp end={commissionAccount?.balance!} prefix={'KES '} />
+                    <CountUp end={commissionAccount?.balance!} prefix={'KES '} decimals={2} />
                     <p className="text-xs text-muted-foreground">
-                        <CountUp end={commissionAccount?.interest!} prefix={'+KES '} suffix={' interest'} />
+                        <CountUp
+                            end={commissionAccount?.interest!}
+                            prefix={'+KES '}
+                            decimals={4}
+                            suffix={' interest'}
+                        />
                     </p>
                 </CardContent>
             </div>
@@ -63,12 +68,14 @@ const SavingsAndInterestBalances = () => {
                 <CardContent className="text-2xl font-bold">
                     <CountUp
                         end={cashbackAccount?.balance! + commissionAccount?.balance!}
+                        decimals={2}
                         prefix={'KES '}
                         className={'text-primary'}
                     />
                     <p className="text-xs text-primary/80">
                         <CountUp
                             end={commissionAccount?.interest! + commissionAccount?.interest!}
+                            decimals={4}
                             prefix={'+KES '}
                             suffix={' interest'}
                         />
