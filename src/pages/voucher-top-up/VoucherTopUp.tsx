@@ -38,8 +38,7 @@ const VoucherTopUp = () => {
     });
 
     const handleTransactionConfirmed = () => {
-        const values = form.getValues();
-        values.amount = Number(values.amount);
+        const values = formSchema.cast(form.getValues());
 
         sendPurchaseRequest(values)
             .unwrap()

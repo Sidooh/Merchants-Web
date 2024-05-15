@@ -36,7 +36,7 @@ export const authApi = {
         } catch (e: unknown) {
             if (axios.isAxiosError(e)) {
                 if (e.response?.status === 404 && e.response.data) {
-                    throw new Error("Seems you aren't yet a Sidooh Merchant.");
+                    throw new Error("You aren't yet a Sidooh Merchant. Click 'Onboard' to become one.");
                 }
             }
         }

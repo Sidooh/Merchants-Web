@@ -51,6 +51,7 @@ const PinConfirmationForm = ({ open, setOpen, canCancel, onConfirmed }: PinConfi
             if (await checkPin(values).unwrap()) {
                 onConfirmed();
 
+                setError(undefined);
                 form.resetField('pin');
             }
         } catch (e) {
@@ -88,6 +89,7 @@ const PinConfirmationForm = ({ open, setOpen, canCancel, onConfirmed }: PinConfi
                                 </FormItem>
                             )}
                         />
+
                         <DialogFooter className={cn('gap-y-3', { 'sm:justify-between ': canCancel })}>
                             {canCancel && (
                                 <DialogClose asChild>
