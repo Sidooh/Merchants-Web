@@ -66,6 +66,19 @@ const merchantsEndpoints = merchantsApi.injectEndpoints({
             ],
         }),
 
+        withdrawSavings: build.mutation<Transaction, EarningsWithdrawalRequest>({
+            query: ({ merchant_id, ...body }) => ({
+                url: `/merchants/${merchant_id}/savings/withdraw`,
+                method: 'POST',
+                body,
+            }),
+            transformResponse: (val: ApiResponse<Transaction>) => val.data,
+            invalidatesTags: [
+                { type: 'EarningAccount', id: 'LIST' },
+                { type: 'Transaction', id: 'LIST' },
+            ],
+        }),
+
         getMerchantByAccount: build.query<Merchant, number>({
             query: (id) => `/merchants/account/${id}`,
             transformResponse: (val: ApiResponse<Merchant>) => val.data,
@@ -87,4 +100,5 @@ export const {
     useTopUpFloatMutation,
     useUpdateKybMutation,
     useWithdrawEarningsMutation,
+    useWithdrawSavingsMutation,
 } = merchantsEndpoints;

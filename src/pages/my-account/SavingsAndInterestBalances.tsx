@@ -4,11 +4,17 @@ import { Skeleton } from '@/components/ui/skeleton.tsx';
 import CountUp from 'react-countup';
 import { FaMoneyBills } from 'react-icons/fa6';
 import { useGetEarningAccountsQuery } from '@/services/savings/savingsApi.ts';
-import { SavingsEarningAccountType } from '@/lib/enums.ts';
+import { EarningsWithdrawalSource, SavingsEarningAccountType } from '@/lib/enums.ts';
 import { useEffect, useState } from 'react';
 import { SavingsEarningAccount } from '@/lib/types/models.ts';
+import { BiMoneyWithdraw } from 'react-icons/bi';
+import { Button } from '@/components/ui/button.tsx';
+import SavingsWithdrawalFormDialog from '@/pages/my-account/SavingsWithdrawalFormDialog.tsx';
 
 const SavingsAndInterestBalances = () => {
+    const [openCommWithdrawalForm, setOpenCommWithdrawalForm] = useState(false);
+    const [openCashWithdrawalForm, setOpenCashWithdrawalForm] = useState(false);
+
     const { user } = useAuth();
 
     const { data: earningAccounts, isLoading } = useGetEarningAccountsQuery(user!.account_id);
@@ -34,11 +40,31 @@ const SavingsAndInterestBalances = () => {
                     <CardTitle className="text-sm font-medium text-muted-foreground">Saved Cashback</CardTitle>
                     <FaMoneyBills />
                 </CardHeader>
-                <CardContent className="text-xl font-bold">
-                    <CountUp end={cashbackAccount?.balance!} decimals={2} prefix={'KES '} />
-                    <p className="text-xs text-muted-foreground">
-                        <CountUp end={cashbackAccount?.interest!} decimals={4} prefix={'+KES '} suffix={' interest'} />
-                    </p>
+                <CardContent className="text-xl font-bold flex justify-between gap-2 items-center">
+                    <div>
+                        <CountUp end={cashbackAccount?.balance!} decimals={2} prefix={'KES '} />
+                        <p className="text-xs text-muted-foreground">
+                            <CountUp
+                                end={cashbackAccount?.interest!}
+                                decimals={4}
+                                prefix={'+KES '}
+                                suffix={' interest'}
+                            />
+                        </p>
+                    </div>
+                    <Button
+                        size={'sm'}
+                        variant={'secondary'}
+                        className={'text-red-700'}
+                        onClick={() => setOpenCashWithdrawalForm(user?.account_id === 2)}
+                    >
+                        Withdraw <BiMoneyWithdraw className="ms-2" />
+                    </Button>
+                    <SavingsWithdrawalFormDialog
+                        open={openCashWithdrawalForm}
+                        setOpen={setOpenCashWithdrawalForm}
+                        source={EarningsWithdrawalSource.CASHBACK}
+                    />
                 </CardContent>
             </div>
 
@@ -47,16 +73,32 @@ const SavingsAndInterestBalances = () => {
                     <CardTitle className="text-sm font-medium text-muted-foreground">Saved Commission</CardTitle>
                     <FaMoneyBills />
                 </CardHeader>
-                <CardContent className="text-xl font-bold">
-                    <CountUp end={commissionAccount?.balance!} prefix={'KES '} decimals={2} />
-                    <p className="text-xs text-muted-foreground">
-                        <CountUp
-                            end={commissionAccount?.interest!}
-                            prefix={'+KES '}
-                            decimals={4}
-                            suffix={' interest'}
-                        />
-                    </p>
+                <CardContent className="text-xl font-bold flex justify-between gap-2 items-center">
+                    <div>
+                        <CountUp end={commissionAccount?.balance!} prefix={'KES '} decimals={2} />
+                        <p className="text-xs text-muted-foreground">
+                            <CountUp
+                                end={commissionAccount?.interest!}
+                                prefix={'+KES '}
+                                decimals={4}
+                                suffix={' interest'}
+                            />
+                        </p>
+                    </div>
+
+                    <Button
+                        size={'sm'}
+                        variant={'secondary'}
+                        className={'text-red-700'}
+                        onClick={() => setOpenCommWithdrawalForm(user?.account_id === 2)}
+                    >
+                        Withdraw <BiMoneyWithdraw className="ms-2" />
+                    </Button>
+                    <SavingsWithdrawalFormDialog
+                        open={openCommWithdrawalForm}
+                        setOpen={setOpenCommWithdrawalForm}
+                        source={EarningsWithdrawalSource.COMMISSION}
+                    />
                 </CardContent>
             </div>
 
