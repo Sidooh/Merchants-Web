@@ -56,7 +56,7 @@ const SavingsAndInterestBalances = () => {
                         size={'sm'}
                         variant={'secondary'}
                         className={'text-red-700'}
-                        onClick={() => setOpenCashWithdrawalForm(user?.account_id === 2)}
+                        onClick={() => setOpenCashWithdrawalForm(true)}
                     >
                         Withdraw <BiMoneyWithdraw className="ms-2" />
                     </Button>
@@ -90,7 +90,7 @@ const SavingsAndInterestBalances = () => {
                         size={'sm'}
                         variant={'secondary'}
                         className={'text-red-700'}
-                        onClick={() => setOpenCommWithdrawalForm(user?.account_id === 2)}
+                        onClick={() => setOpenCommWithdrawalForm(true)}
                     >
                         Withdraw <BiMoneyWithdraw className="ms-2" />
                     </Button>
