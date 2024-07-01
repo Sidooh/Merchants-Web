@@ -15,6 +15,7 @@ COPY package.json yarn.lock .yarnrc.yml vite.config.ts tsconfig.json tsconfig.no
 COPY src/ ./src/
 COPY public/ ./public/
 
+RUN corepack enable
 RUN yarn install
 RUN yarn run build
 
