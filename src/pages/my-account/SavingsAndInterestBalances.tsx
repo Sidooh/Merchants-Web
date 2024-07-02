@@ -57,7 +57,7 @@ const SavingsAndInterestBalances = () => {
                         variant={'secondary'}
                         className={'text-red-700'}
                         onClick={() => setOpenCashWithdrawalForm(true)}
-                        disabled={(cashbackAccount?.balance ?? 0) < 20}
+                        disabled={true || (cashbackAccount?.balance ?? 0) < 20}
                     >
                         Withdraw <BiMoneyWithdraw className="ms-2" />
                     </Button>
@@ -95,7 +95,7 @@ const SavingsAndInterestBalances = () => {
                         variant={'secondary'}
                         className={'text-red-700'}
                         onClick={() => setOpenCommWithdrawalForm(true)}
-                        disabled={(commissionAccount?.balance ?? 0) < 20}
+                        disabled={true || (commissionAccount?.balance ?? 0) < 20}
                     >
                         Withdraw <BiMoneyWithdraw className="ms-2" />
                     </Button>
