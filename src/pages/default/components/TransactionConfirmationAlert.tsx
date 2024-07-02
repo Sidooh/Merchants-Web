@@ -3,6 +3,7 @@ import {
     AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
+    AlertDialogDescription,
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
@@ -15,6 +16,7 @@ import { currencyFormat } from '@/lib/utils.ts';
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { useGetChargesQuery } from '@/services/payments/paymentsApi.ts';
 import { EarningsWithdrawalRequest } from '@/lib/types/requests.ts';
+import { TiThumbsUp } from 'react-icons/ti';
 
 type TransactionConfirmationAlertProps = {
     values: MpesaFloatPurchaseRequest | VoucherPurchaseRequest | EarningsWithdrawalRequest;
@@ -23,9 +25,11 @@ type TransactionConfirmationAlertProps = {
     onConfirmed: () => void;
     product: MerchantProduct;
     children: ReactNode;
+    balance?: number;
 };
 
 const TransactionConfirmationAlert = ({
+    balance,
     values,
     open,
     setOpen,
@@ -63,6 +67,35 @@ const TransactionConfirmationAlert = ({
     useEffect(() => {
         setCharge(charges?.find((c) => c.min <= values.amount && values.amount <= c.max));
     }, [charges, values.amount]);
+
+    if (product === MerchantProduct.EARNINGS_WITHDRAW) {
+        if (!charge) return null;
+
+        if (balance && balance <= Number(values.amount) + charge.charge)
+            return (
+                <AlertDialog open={open} onOpenChange={setOpen}>
+                    <AlertDialogContent className={'max-w-xs'}>
+                        <AlertDialogHeader className={'text-start'}>
+                            <AlertDialogTitle>Insufficient Account Balance</AlertDialogTitle>
+                            <AlertDialogDescription className={'text-red-700'}>
+                                Your account balance (<b>{currencyFormat(balance)}</b>) is <b>insufficient</b> to
+                                withdraw <b>{currencyFormat(values.amount)}.</b> <br /> Please ensure the withdrawal
+                                amount plus fees (<b>{currencyFormat(charge?.charge)}</b>) is within your balance.{' '}
+                                <br />
+                                Thank You.
+                            </AlertDialogDescription>
+
+                            <Separator className="my-4" />
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>
+                                Okay <TiThumbsUp className={'ms-1'} />
+                            </AlertDialogCancel>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            );
+    }
 
     return (
         <AlertDialog open={open} onOpenChange={setOpen}>

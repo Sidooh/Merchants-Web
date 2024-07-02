@@ -33,13 +33,15 @@ import {
     MerchantProduct,
     PaymentMethod,
 } from '@/lib/enums.ts';
-import { Str, toast } from '@/lib/utils.ts';
+import { currencyFormat, Str, toast } from '@/lib/utils.ts';
 import PinConfirmationForm from '@/pages/default/components/PinConfirmationForm.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
 import TransactionConfirmationAlert from '@/pages/default/components/TransactionConfirmationAlert.tsx';
 import { SAFARICOM_REGEX } from '@/constants';
+import { MerchantEarningAccount } from '@/lib/types/models.ts';
 
 type WithdrawalFormDialogProps = {
+    account: MerchantEarningAccount;
     source?: EarningsWithdrawalSource;
     open: boolean;
     setOpen?: Dispatch<SetStateAction<boolean>>;
@@ -72,7 +74,7 @@ const formSchema = yup.object({
         }),
 });
 
-const WithdrawalFormDialog = ({ source, open, setOpen }: WithdrawalFormDialogProps) => {
+const WithdrawalFormDialog = ({ account, source, open, setOpen }: WithdrawalFormDialogProps) => {
     const { user } = useAuth();
 
     const [openPinConfirmationForm, setOpenPinConfirmationForm] = useState(false);
@@ -223,6 +225,7 @@ const WithdrawalFormDialog = ({ source, open, setOpen }: WithdrawalFormDialogPro
                                             <FormLabel>Amount</FormLabel>
                                             <FormControl>
                                                 <Input
+                                                    autoFocus
                                                     placeholder="e.g: 300"
                                                     type={'number'}
                                                     min={10}
@@ -230,7 +233,10 @@ const WithdrawalFormDialog = ({ source, open, setOpen }: WithdrawalFormDialogPro
                                                     {...form.register('amount')}
                                                 />
                                             </FormControl>
-                                            <FormDescription>Minimum KES.10</FormDescription>
+                                            <FormDescription>
+                                                Min: <b>KES 10</b> -{' Max: '}
+                                                <b>{currencyFormat(account?.amount)}</b>
+                                            </FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -251,6 +257,7 @@ const WithdrawalFormDialog = ({ source, open, setOpen }: WithdrawalFormDialogPro
             </Dialog>
 
             <TransactionConfirmationAlert
+                balance={account.amount}
                 product={MerchantProduct.EARNINGS_WITHDRAW}
                 open={openTransactionConfirmationAlert}
                 values={form.getValues()}
