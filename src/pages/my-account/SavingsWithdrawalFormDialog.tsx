@@ -244,7 +244,7 @@ const SavingsWithdrawalFormDialog = ({ account, source, open, setOpen }: Withdra
                                                     Min: <b>KES 20</b>
                                                 </small>
                                                 <small className={'text-yellow-700'}>
-                                                    <b>BALANCE - {currencyFormat(account.balance)}</b>
+                                                    <b>BALANCE: {currencyFormat(account.balance)}</b>
                                                 </small>
                                             </FormDescription>
                                             <FormMessage />
