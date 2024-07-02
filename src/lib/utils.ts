@@ -7,6 +7,7 @@ import { FaCalendarXmark, FaCheck, FaCircleExclamation, FaCircleInfo, FaHourglas
 import moment from 'moment';
 import { authApi } from '@/features/auth/authApi.ts';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import secureLocalStorage from 'react-secure-storage';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -110,7 +111,7 @@ export const currencyFormat = (number?: number, currency = 'KES', decimals = 2):
 };
 
 export const getAuthToken = async () => {
-    let token = JSON.parse(String(localStorage.getItem('token')));
+    let token = JSON.parse(String(secureLocalStorage.getItem('token')));
 
     if (!token) token = await authApi.authenticateService();
 
