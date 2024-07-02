@@ -78,10 +78,9 @@ const TransactionConfirmationAlert = ({
                         <AlertDialogHeader className={'text-start'}>
                             <AlertDialogTitle>Insufficient Account Balance</AlertDialogTitle>
                             <AlertDialogDescription className={'text-red-700'}>
-                                Your account balance (<b>{currencyFormat(balance)}</b>) is <b>insufficient</b> to
-                                withdraw <b>{currencyFormat(values.amount)}.</b> <br /> Please ensure the withdrawal
-                                amount plus fees (<b>{currencyFormat(charge?.charge)}</b>) is within your balance.{' '}
-                                <br />
+                                Your account balance (<b>{currencyFormat(balance)}</b>) is insufficient to withdraw{' '}
+                                <b>{currencyFormat(values.amount)}.</b> <br /> Please ensure the withdrawal amount plus
+                                fees (<b>{currencyFormat(charge?.charge)}</b>) is within your balance. <br />
                                 Thank You.
                             </AlertDialogDescription>
 
