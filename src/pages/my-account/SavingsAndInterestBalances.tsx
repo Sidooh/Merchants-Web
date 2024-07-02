@@ -4,12 +4,9 @@ import { Skeleton } from '@/components/ui/skeleton.tsx';
 import CountUp from 'react-countup';
 import { FaMoneyBills } from 'react-icons/fa6';
 import { useGetEarningAccountsQuery } from '@/services/savings/savingsApi.ts';
-import { EarningsWithdrawalSource, SavingsEarningAccountType } from '@/lib/enums.ts';
+import { SavingsEarningAccountType } from '@/lib/enums.ts';
 import { useEffect, useState } from 'react';
 import { SavingsEarningAccount } from '@/lib/types/models.ts';
-import { BiMoneyWithdraw } from 'react-icons/bi';
-import { Button } from '@/components/ui/button.tsx';
-import SavingsWithdrawalFormDialog from '@/pages/my-account/SavingsWithdrawalFormDialog.tsx';
 
 const SavingsAndInterestBalances = () => {
     const [openCommWithdrawalForm, setOpenCommWithdrawalForm] = useState(false);
@@ -52,19 +49,19 @@ const SavingsAndInterestBalances = () => {
                             />
                         </p>
                     </div>
-                    <Button
-                        size={'sm'}
-                        variant={'secondary'}
-                        className={'text-red-700'}
-                        onClick={() => setOpenCashWithdrawalForm(true)}
-                    >
-                        Withdraw <BiMoneyWithdraw className="ms-2" />
-                    </Button>
-                    <SavingsWithdrawalFormDialog
-                        open={openCashWithdrawalForm}
-                        setOpen={setOpenCashWithdrawalForm}
-                        source={EarningsWithdrawalSource.CASHBACK}
-                    />
+                    {/*<Button*/}
+                    {/*    size={'sm'}*/}
+                    {/*    variant={'secondary'}*/}
+                    {/*    className={'text-red-700'}*/}
+                    {/*    onClick={() => setOpenCashWithdrawalForm(true)}*/}
+                    {/*>*/}
+                    {/*    Withdraw <BiMoneyWithdraw className="ms-2" />*/}
+                    {/*</Button>*/}
+                    {/*<SavingsWithdrawalFormDialog*/}
+                    {/*    open={openCashWithdrawalForm}*/}
+                    {/*    setOpen={setOpenCashWithdrawalForm}*/}
+                    {/*    source={EarningsWithdrawalSource.CASHBACK}*/}
+                    {/*/>*/}
                 </CardContent>
             </div>
 
@@ -86,19 +83,19 @@ const SavingsAndInterestBalances = () => {
                         </p>
                     </div>
 
-                    <Button
-                        size={'sm'}
-                        variant={'secondary'}
-                        className={'text-red-700'}
-                        onClick={() => setOpenCommWithdrawalForm(true)}
-                    >
-                        Withdraw <BiMoneyWithdraw className="ms-2" />
-                    </Button>
-                    <SavingsWithdrawalFormDialog
-                        open={openCommWithdrawalForm}
-                        setOpen={setOpenCommWithdrawalForm}
-                        source={EarningsWithdrawalSource.COMMISSION}
-                    />
+                    {/*<Button*/}
+                    {/*    size={'sm'}*/}
+                    {/*    variant={'secondary'}*/}
+                    {/*    className={'text-red-700'}*/}
+                    {/*    onClick={() => setOpenCommWithdrawalForm(true)}*/}
+                    {/*>*/}
+                    {/*    Withdraw <BiMoneyWithdraw className="ms-2" />*/}
+                    {/*</Button>*/}
+                    {/*<SavingsWithdrawalFormDialog*/}
+                    {/*    open={openCommWithdrawalForm}*/}
+                    {/*    setOpen={setOpenCommWithdrawalForm}*/}
+                    {/*    source={EarningsWithdrawalSource.COMMISSION}*/}
+                    {/*/>*/}
                 </CardContent>
             </div>
 
