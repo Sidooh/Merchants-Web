@@ -35,12 +35,14 @@ const Balance = ({ earningAccount, isLoading }: BalanceProps) => {
                     variant={'secondary'}
                     className={'text-red-700'}
                     onClick={() => setOpenWithdrawalForm(true)}
+                    disabled={earningAccount?.amount < 10}
                 >
                     Withdraw <BiMoneyWithdraw className="ms-2" />
                 </Button>
             </CardContent>
 
             <WithdrawalFormDialog
+                account={earningAccount}
                 open={openWithdrawalForm}
                 setOpen={setOpenWithdrawalForm}
                 source={earningAccount.type as unknown as EarningsWithdrawalSource}

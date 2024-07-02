@@ -57,14 +57,18 @@ const SavingsAndInterestBalances = () => {
                         variant={'secondary'}
                         className={'text-red-700'}
                         onClick={() => setOpenCashWithdrawalForm(true)}
+                        disabled={(cashbackAccount?.balance ?? 0) < 20}
                     >
                         Withdraw <BiMoneyWithdraw className="ms-2" />
                     </Button>
-                    <SavingsWithdrawalFormDialog
-                        open={openCashWithdrawalForm}
-                        setOpen={setOpenCashWithdrawalForm}
-                        source={EarningsWithdrawalSource.CASHBACK}
-                    />
+                    {cashbackAccount && (
+                        <SavingsWithdrawalFormDialog
+                            account={cashbackAccount}
+                            open={openCashWithdrawalForm}
+                            setOpen={setOpenCashWithdrawalForm}
+                            source={EarningsWithdrawalSource.CASHBACK}
+                        />
+                    )}
                 </CardContent>
             </div>
 
@@ -91,14 +95,18 @@ const SavingsAndInterestBalances = () => {
                         variant={'secondary'}
                         className={'text-red-700'}
                         onClick={() => setOpenCommWithdrawalForm(true)}
+                        disabled={(commissionAccount?.balance ?? 0) < 20}
                     >
                         Withdraw <BiMoneyWithdraw className="ms-2" />
                     </Button>
-                    <SavingsWithdrawalFormDialog
-                        open={openCommWithdrawalForm}
-                        setOpen={setOpenCommWithdrawalForm}
-                        source={EarningsWithdrawalSource.COMMISSION}
-                    />
+                    {commissionAccount && (
+                        <SavingsWithdrawalFormDialog
+                            account={commissionAccount}
+                            open={openCommWithdrawalForm}
+                            setOpen={setOpenCommWithdrawalForm}
+                            source={EarningsWithdrawalSource.COMMISSION}
+                        />
+                    )}
                 </CardContent>
             </div>
 

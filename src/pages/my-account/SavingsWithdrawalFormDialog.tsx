@@ -33,13 +33,15 @@ import {
     MerchantProduct,
     PaymentMethod,
 } from '@/lib/enums.ts';
-import { Str, toast } from '@/lib/utils.ts';
+import { currencyFormat, Str, toast } from '@/lib/utils.ts';
 import PinConfirmationForm from '@/pages/default/components/PinConfirmationForm.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
 import TransactionConfirmationAlert from '@/pages/default/components/TransactionConfirmationAlert.tsx';
 import { SAFARICOM_REGEX } from '@/constants';
+import { SavingsEarningAccount } from '@/lib/types/models.ts';
 
 type WithdrawalFormDialogProps = {
+    account: SavingsEarningAccount;
     source?: EarningsWithdrawalSource;
     open: boolean;
     setOpen?: Dispatch<SetStateAction<boolean>>;
@@ -72,13 +74,14 @@ const formSchema = yup.object({
         }),
 });
 
-const SavingsWithdrawalFormDialog = ({ source, open, setOpen }: WithdrawalFormDialogProps) => {
+const SavingsWithdrawalFormDialog = ({ account, source, open, setOpen }: WithdrawalFormDialogProps) => {
     const { user } = useAuth();
 
     const [openPinConfirmationForm, setOpenPinConfirmationForm] = useState(false);
     const [openTransactionConfirmationAlert, setOpenTransactionConfirmationAlert] = useState(false);
 
     const [withdrawSavings, { isLoading, error }] = useWithdrawSavingsMutation();
+    const [customError, setCustomError] = useState<string>();
 
     const form = useForm<yup.InferType<typeof formSchema>>({
         resolver: yupResolver(formSchema),
@@ -91,6 +94,11 @@ const SavingsWithdrawalFormDialog = ({ source, open, setOpen }: WithdrawalFormDi
     });
 
     const handleSubmit: SubmitHandler<EarningsWithdrawalRequest> = async () => {
+        const { amount } = form.getValues();
+
+        if (amount > account.balance) return setCustomError('Insufficient balance for the set amount.');
+
+        setCustomError(undefined);
         setOpenTransactionConfirmationAlert(true);
     };
 
@@ -129,7 +137,7 @@ const SavingsWithdrawalFormDialog = ({ source, open, setOpen }: WithdrawalFormDi
                             <DialogHeader>
                                 <DialogTitle>Withdraw Savings</DialogTitle>
                                 <DialogDescription>Please fill in the form to complete withdrawal.</DialogDescription>
-                                <AlertError error={error} className={'mt-4'} />
+                                <AlertError error={error || customError} className={'mt-4'} />
                             </DialogHeader>
                             <div className="grid gap-3">
                                 {!source && (
@@ -223,6 +231,7 @@ const SavingsWithdrawalFormDialog = ({ source, open, setOpen }: WithdrawalFormDi
                                             <FormLabel>Amount</FormLabel>
                                             <FormControl>
                                                 <Input
+                                                    autoFocus
                                                     placeholder="e.g: 300"
                                                     type={'number'}
                                                     min={10}
@@ -230,7 +239,10 @@ const SavingsWithdrawalFormDialog = ({ source, open, setOpen }: WithdrawalFormDi
                                                     {...form.register('amount')}
                                                 />
                                             </FormControl>
-                                            <FormDescription>Minimum KES.20</FormDescription>
+                                            <FormDescription>
+                                                Min: <b>KES 20</b> -{' Max: '}
+                                                <b>{currencyFormat(account?.balance)}</b>
+                                            </FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -251,6 +263,7 @@ const SavingsWithdrawalFormDialog = ({ source, open, setOpen }: WithdrawalFormDi
             </Dialog>
 
             <TransactionConfirmationAlert
+                balance={account.balance}
                 product={MerchantProduct.EARNINGS_WITHDRAW}
                 open={openTransactionConfirmationAlert}
                 values={form.getValues()}
