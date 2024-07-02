@@ -235,13 +235,17 @@ const SavingsWithdrawalFormDialog = ({ account, source, open, setOpen }: Withdra
                                                     placeholder="e.g: 300"
                                                     type={'number'}
                                                     min={10}
-                                                    max={250000}
+                                                    max={account.balance < 250000 ? account.balance : 250000}
                                                     {...form.register('amount')}
                                                 />
                                             </FormControl>
-                                            <FormDescription>
-                                                Min: <b>KES 20</b> -{' Max: '}
-                                                <b>{currencyFormat(account?.balance)}</b>
+                                            <FormDescription className={'flex justify-between'}>
+                                                <small>
+                                                    Min: <b>KES 20</b>
+                                                </small>
+                                                <small className={'text-yellow-700'}>
+                                                    <b>BALANCE - {currencyFormat(account.balance)}</b>
+                                                </small>
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -272,7 +276,7 @@ const SavingsWithdrawalFormDialog = ({ account, source, open, setOpen }: Withdra
             >
                 <div className="space-y-1">
                     <h4 className="text-xs text-muted-foreground font-medium leading-none">Withdrawal From</h4>
-                    <p className="text-sm ">{form.getValues('source')}</p>
+                    <p className="text-sm ">LOCKED {form.getValues('source')}</p>
                 </div>
                 <Separator className="my-4" />
                 <div className="space-y-1">
