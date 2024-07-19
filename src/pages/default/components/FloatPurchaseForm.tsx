@@ -21,13 +21,13 @@ import { useBuyMpesaFloatMutation, useGetMpesaStoresQuery } from '@/services/mer
 import { useAuth } from '@/hooks/useAuth.ts';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { MerchantProduct, PaymentMethod } from '@/lib/enums.ts';
-import { toast } from '@/lib/utils.ts';
 import { SAFARICOM_REGEX } from '@/constants';
 import SubmitButton from '@/components/common/SubmitButton.tsx';
 import { useGetFloatAccountQuery } from '@/services/payments/floatEndpoints.ts';
 import PinConfirmationForm from '@/pages/default/components/PinConfirmationForm.tsx';
 import TransactionConfirmationAlert from '@/pages/default/components/TransactionConfirmationAlert.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
+import { toast } from 'sonner';
 
 const formSchema = yup.object({
     merchant_id: yup.number().integer().required(),
@@ -80,16 +80,16 @@ const FloatPurchaseForm = () => {
         sendPurchaseRequest(formSchema.cast(values))
             .unwrap()
             .then(() => {
-                toast({ titleText: 'Transaction Initiated Successfully!' });
+                toast.success('Transaction Initiated Successfully!');
 
                 form.reset();
             })
-            .catch(() => toast({ titleText: 'Something went wrong. Please retry!', icon: 'error' }));
+            .catch(() => toast.error('Something went wrong. Please retry!'));
     };
 
     const handleSubmit: SubmitHandler<MpesaFloatPurchaseRequest> = async (values) => {
         if (values.method === PaymentMethod.FLOAT && values.amount > (floatAccount?.balance || 0))
-            return toast({ titleText: 'Insufficient voucher balance.', icon: 'warning' });
+            return toast.warning('Insufficient voucher balance.');
 
         setOpenTransactionConfirmationAlert(true);
     };

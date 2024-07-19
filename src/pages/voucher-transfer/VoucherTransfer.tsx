@@ -1,6 +1,13 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card.tsx';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
-import { VoucherPurchaseRequest } from '@/lib/types.ts';
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form.tsx';
 import { CheckCircledIcon } from '@radix-ui/react-icons';
 import { Input } from '@/components/ui/input.tsx';
 import SubmitButton from '@/components/common/SubmitButton.tsx';
@@ -9,48 +16,61 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '@/hooks/useAuth.ts';
 import * as yup from 'yup';
 import { SAFARICOM_REGEX } from '@/constants';
-import { useTopUpFloatMutation } from '@/services/merchants/merchantsEndpoints.ts';
-import { toast } from 'sonner';
-import { MerchantProduct } from '@/lib/enums.ts';
-import { Separator } from '@/components/ui/separator.tsx';
-import TransactionConfirmationAlert from '@/pages/default/components/TransactionConfirmationAlert.tsx';
+import { useTransferFloatMutation } from '@/services/merchants/merchantsEndpoints.ts';
 import { useState } from 'react';
+import ShareVoucherConfirmationDialogue from '@/components/confirmation-dialogues/ShareVoucherConfirmationDialogue.tsx';
+import { toast } from 'sonner';
+import { useGetFloatAccountQuery } from '@/services/payments/floatEndpoints.ts';
+import { Skeleton } from '@/components/ui/skeleton.tsx';
+import { currencyFormat } from '@/lib/utils.ts';
 
 const formSchema = yup.object({
-    merchant_id: yup.number().integer().required(),
-    amount: yup.number().typeError('Please enter amount').required('Amount is required.'),
+    amount: yup.number().min(50).typeError('Please enter amount').required('Amount is required.'),
     phone: yup.string().matches(SAFARICOM_REGEX, { message: 'Invalid phone number' }).required('Phone is required.'),
 });
 
-const VoucherTopUp = () => {
-    const [openTransactionConfirmationAlert, setOpenTransactionConfirmationAlert] = useState(false);
+export type VoucherTransferFormRequest = yup.InferType<typeof formSchema>;
+
+const VoucherTransfer = () => {
+    const [openConfirmationAlert, setOpenTransactionConfirmationAlert] = useState(false);
 
     const { user } = useAuth();
-    const [sendPurchaseRequest, { isLoading }] = useTopUpFloatMutation();
+    const { data: floatAccount, isLoading: isLoadingFloatAccount } = useGetFloatAccountQuery(user!.float_account_id);
+    const [sendTransferRequest, { isLoading }] = useTransferFloatMutation();
 
-    const form = useForm<VoucherPurchaseRequest>({
+    const form = useForm<VoucherTransferFormRequest>({
         mode: 'onBlur',
         resolver: yupResolver(formSchema),
         defaultValues: {
-            merchant_id: user?.merchant_id,
-            phone: String(user?.phone),
+            phone: '',
         },
     });
 
-    const handleTransactionConfirmed = () => {
-        const values = formSchema.cast(form.getValues());
+    const handleTransactionConfirmed = (destinationMerchantId: number) => {
+        const data = formSchema.cast(form.getValues());
 
-        sendPurchaseRequest(values)
+        sendTransferRequest({
+            merchant_id: user!.merchant_id,
+            amount: data.amount,
+            account: String(destinationMerchantId),
+        })
             .unwrap()
             .then(() => {
-                toast.success('Transaction Initiated Successfully!');
+                toast.success('Transfer Initiated Successfully!');
 
-                form.reset({ amount: undefined });
+                form.reset();
             })
             .catch(() => toast.error('Something went wrong. Please retry!'));
     };
 
-    const handleSubmit: SubmitHandler<VoucherPurchaseRequest> = () => setOpenTransactionConfirmationAlert(true);
+    const handleSubmit: SubmitHandler<VoucherTransferFormRequest> = (values) => {
+        if (values.phone.slice(-9) === String(user?.phone).slice(-9)) return toast.warning('Cannot share to self.🌚');
+        if (values.amount > (floatAccount?.balance || 0)) return toast.warning('Insufficient voucher balance.');
+
+        setOpenTransactionConfirmationAlert(true);
+    };
+
+    if (isLoadingFloatAccount) return <Skeleton className={'h-[20rem]'} />;
 
     return (
         <>
@@ -58,8 +78,10 @@ const VoucherTopUp = () => {
                 <form onSubmit={form.handleSubmit(handleSubmit)}>
                     <Card>
                         <CardHeader>
-                            <CardTitle>Top Up Sidooh Voucher</CardTitle>
-                            <CardDescription>Enter amount and phone number to top up voucher.</CardDescription>
+                            <CardTitle>Share Your Sidooh Voucher</CardTitle>
+                            <CardDescription>
+                                Enter amount and the phone number of a Sidooh Merchant to share with.
+                            </CardDescription>
                         </CardHeader>
                         <CardContent className="grid lg:grid-cols-2 gap-3">
                             <FormField
@@ -72,11 +94,19 @@ const VoucherTopUp = () => {
                                             <Input
                                                 placeholder="e.g: 200,000"
                                                 type={'number'}
-                                                min={10}
-                                                max={250000}
+                                                min={50}
+                                                max={floatAccount?.balance}
                                                 {...form.register('amount')}
                                             />
                                         </FormControl>
+                                        <FormDescription className={'flex justify-between'}>
+                                            <small>
+                                                Min: <b>KES 50</b>
+                                            </small>
+                                            <small className={'text-yellow-700'}>
+                                                <b>BALANCE: {currencyFormat(floatAccount?.balance)}</b>
+                                            </small>
+                                        </FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -87,7 +117,7 @@ const VoucherTopUp = () => {
                                 name="phone"
                                 render={() => (
                                     <FormItem>
-                                        <FormLabel>M-PESA phone number</FormLabel>
+                                        <FormLabel>Phone number</FormLabel>
                                         <FormControl>
                                             <Input
                                                 placeholder="0712345678"
@@ -104,7 +134,7 @@ const VoucherTopUp = () => {
                             <SubmitButton
                                 disabled={isLoading || !form.formState.isValid}
                                 isLoading={isLoading}
-                                text={'Initiate Transaction'}
+                                text={'Initiate Transfer'}
                                 loadingText={'Initiating...'}
                                 icon={CheckCircledIcon}
                             />
@@ -113,21 +143,14 @@ const VoucherTopUp = () => {
                 </form>
             </Form>
 
-            <TransactionConfirmationAlert
-                product={MerchantProduct.FLOAT_PURCHASE}
-                open={openTransactionConfirmationAlert}
+            <ShareVoucherConfirmationDialogue
+                open={openConfirmationAlert}
                 values={form.getValues()}
                 setOpen={setOpenTransactionConfirmationAlert}
                 onConfirmed={handleTransactionConfirmed}
-            >
-                <div className="space-y-1">
-                    <h4 className="text-xs text-muted-foreground font-medium leading-none">Payment Method</h4>
-                    <p className="text-sm ">MPESA - {form.getValues('phone')}</p>
-                </div>
-                <Separator className="my-4" />
-            </TransactionConfirmationAlert>
+            />
         </>
     );
 };
 
-export default VoucherTopUp;
+export default VoucherTransfer;

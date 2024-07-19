@@ -10,12 +10,12 @@ import * as yup from 'yup';
 import { AiOutlineLogin } from 'react-icons/ai';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect } from 'react';
-import { toast } from '@/lib/utils';
 import { CONFIG } from '@/config';
 import { SAFARICOM_REGEX } from '@/constants';
 import SubmitButton from '@/components/common/SubmitButton.tsx';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGenerateOTPMutation } from '@/services/accounts/authEndpoints.ts';
+import { toast } from 'sonner';
 
 const formSchema = yup.object({
     phone: yup.string().matches(SAFARICOM_REGEX, { message: 'Invalid phone number' }).required('Phone is required.'),
@@ -49,7 +49,7 @@ const Login = () => {
     };
 
     useEffect(() => {
-        if (isError) toast({ titleText: message, icon: 'error' });
+        if (isError) toast.error(message);
         if (isSuccess) navigate('/otp');
 
         dispatch(reset());

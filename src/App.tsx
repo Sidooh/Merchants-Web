@@ -14,6 +14,7 @@ import Waitlist from '@/pages/auth/Waitlist.tsx';
 import StagePhone from '@/pages/auth/Onboarding/StagePhone.tsx';
 import StageKYC from '@/pages/auth/Onboarding/StageKYC.tsx';
 import StageInviteCode from '@/pages/auth/Onboarding/StageInviteCode.tsx';
+import VoucherTransfer from '@/pages/voucher-transfer/VoucherTransfer.tsx';
 
 function App() {
     return (
@@ -34,6 +35,7 @@ function App() {
                 <Route index element={<Default />} />
                 <Route path={'/buy-mpesa-float'} element={<MpesaFloatPurchase />} />
                 <Route path={'/voucher-top-up'} element={<VoucherTopUp />} />
+                <Route path={'/share-voucher'} element={<VoucherTransfer />} />
                 <Route path={'/my-account'} element={<MyAccount />} />
             </Route>
 

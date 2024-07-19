@@ -8,7 +8,7 @@ import { CONFIG } from '@/config';
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp.tsx';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
-import { cn, toast } from '@/lib/utils.ts';
+import { cn } from '@/lib/utils.ts';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAppDispatch } from '@/app/store.ts';
@@ -17,6 +17,7 @@ import { BiRotateLeft } from 'react-icons/bi';
 import AlertError from '@/components/errors/AlertError.tsx';
 import { useGenerateOTPMutation, useVerifyOTPMutation } from '@/services/accounts/authEndpoints.ts';
 import { useAuth } from '@/hooks/useAuth.ts';
+import { toast } from 'sonner';
 
 const formSchema = yup.object({
     phone: yup.string().required('Phone is required.'),
@@ -71,7 +72,7 @@ const OTP = () => {
 
                     navigate('/');
                 } else {
-                    toast({ titleText: 'Verified!' });
+                    toast('Verified!');
 
                     navigate(location.state.next, { state: location.state });
                 }
