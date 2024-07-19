@@ -9,6 +9,7 @@ import {
     UpdateKybRequest,
     VoucherPurchaseRequest,
     VoucherPurchaseResponse,
+    VoucherTransferRequest,
 } from '@/lib/types.ts';
 import { merchantsApi } from '@/services/merchants/merchantsApi.ts';
 import { providesList } from '@/lib/utils.ts';
@@ -47,6 +48,15 @@ const merchantsEndpoints = merchantsApi.injectEndpoints({
         topUpFloat: build.mutation<VoucherPurchaseResponse, VoucherPurchaseRequest>({
             query: ({ merchant_id, ...body }) => ({
                 url: `/merchants/${merchant_id}/float-top-up`,
+                method: 'POST',
+                body,
+            }),
+            transformResponse: (val: ApiResponse<VoucherPurchaseResponse>) => val.data,
+            invalidatesTags: [{ type: 'Transaction', id: 'LIST' }],
+        }),
+        transferFloat: build.mutation<VoucherPurchaseResponse, VoucherTransferRequest>({
+            query: ({ merchant_id, ...body }) => ({
+                url: `/merchants/${merchant_id}/float-transfer`,
                 method: 'POST',
                 body,
             }),
@@ -98,6 +108,7 @@ export const {
     useGetMpesaStoresQuery,
     useLazyGetMerchantByAccountQuery,
     useTopUpFloatMutation,
+    useTransferFloatMutation,
     useUpdateKybMutation,
     useWithdrawEarningsMutation,
     useWithdrawSavingsMutation,

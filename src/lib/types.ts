@@ -133,6 +133,12 @@ export type VoucherPurchaseRequest = {
     phone: string;
 };
 
+export type VoucherTransferRequest = {
+    merchant_id: number;
+    account: string;
+    amount: number;
+};
+
 export type VoucherPurchaseResponse = Transaction & {
     merchant_id: number;
 };

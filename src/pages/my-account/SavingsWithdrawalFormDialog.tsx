@@ -33,12 +33,13 @@ import {
     MerchantProduct,
     PaymentMethod,
 } from '@/lib/enums.ts';
-import { currencyFormat, Str, toast } from '@/lib/utils.ts';
+import { currencyFormat, Str } from '@/lib/utils.ts';
 import PinConfirmationForm from '@/pages/default/components/PinConfirmationForm.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
 import TransactionConfirmationAlert from '@/pages/default/components/TransactionConfirmationAlert.tsx';
 import { SAFARICOM_REGEX } from '@/constants';
 import { SavingsEarningAccount } from '@/lib/types/models.ts';
+import { toast } from 'sonner';
 
 type WithdrawalFormDialogProps = {
     account: SavingsEarningAccount;
@@ -121,11 +122,11 @@ const SavingsWithdrawalFormDialog = ({ account, source, open, setOpen }: Withdra
         withdrawSavings(values)
             .unwrap()
             .then(() => {
-                toast({ titleText: 'Withdrawal Initiated Successfully!' });
+                toast('Withdrawal Initiated Successfully!');
 
                 form.reset();
             })
-            .catch(() => toast({ titleText: 'Something went wrong. Please retry!', icon: 'error' }));
+            .catch(() => toast.error('Something went wrong. Please retry!'));
     };
 
     return (

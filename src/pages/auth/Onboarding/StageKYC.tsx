@@ -9,7 +9,7 @@ import { AiOutlineLogin } from 'react-icons/ai';
 import { CONFIG } from '@/config.ts';
 import { CreateMerchantRequest, UpdateKybRequest } from '@/lib/types.ts';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@/lib/utils.ts';
+import { toast } from 'sonner';
 import { useCreateMerchantMutation, useUpdateKybMutation } from '@/services/merchants/merchantsEndpoints.ts';
 import { useEffect } from 'react';
 import secureLocalStorage from 'react-secure-storage';
@@ -41,16 +41,7 @@ const StageKYC = () => {
 
         navigate('/waitlist');
 
-        /*toast({
-            title: 'Onboarding Successful!',
-            text: 'We have sent you an SMS with your new Sidooh store number. Use it to sign in.',
-            toast: false,
-            showConfirmButton: true,
-            timer: undefined,
-            position: 'center',
-        });*/
-
-        toast({ titleText: 'Onboarding Successful!' });
+        toast('Onboarding Successful!');
 
         secureLocalStorage.removeItem('acc');
     };
